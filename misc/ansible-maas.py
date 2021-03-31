@@ -1,65 +1,74 @@
 #!/usr/bin/env python
 
 """
-A dynamic inventory script for MAAS that can be used as an inventory for ansible.
+Ansible Dynamic Inventory Script for Ubuntu MAAS.
 
-This script fetches hosts data for ansible from MAAS, using tags in order to
-identify groups and roles.
-The script should be copied to AWX/Tower within the inventory script dialog interface.
-Using the `--list` argument to invoke the dynamic inventory process.
+This script fetches hosts data for Ansible from Ubuntu MAAS, using Tags to
+identify groups and roles. It is expected that the script will be copied to
+Tower within the new Inventory Scripts dialog offered within the interface,
+where it will be passed the `--list` argument to invoke the dynamic inventory
+process.
 
-It is also possible to run the script as a standalone script or as a replacement for the
+It is also possible to run as a standalone script or a replacement for the
 Ansible `hosts` file.
 
-See https://docs.maas.io/2.4/en/api for API details
+See https://docs.ubuntu.com/maas/2.1/en/api for API details
+
+:copyright: Internet Solutions (Pty) Ltd, 2015
+:author: Paul Stevens <mailto:paul.stevens@is.co.za>
+:copyright: Martijn van der kleijn, 2017
+:author: Martijn van der Kleijn <mailto:martijn.niji@gmail.com>
+:license: Released under the Apache 2.0 License. See LICENSE for details.
+:version: 2.0.1
+:date: 11 May 2017
 """
 
 import argparse
 import json
-import oauth.oauth as oauth
 import os
-import pickle
 import re
-import requests
 import sys
 import uuid
+import pickle
 
+import oauth2 as oauth
+import requests
 
-class Call_inventory:
-    """Provides methods to retrieve information from MAAS API."""
+class Inventory:
+    """Provide several convenience methods to retrieve information from MAAS API."""
 
     def __init__(self):
         """Check for precense of mandatory environment variables and route commands."""
         self.supported = '2.0'
-        self.apikeydocs = 'https://docs.maas.io/2.4/en/manage-cli#log-in-(required)'
+        self.apikeydocs = 'https://docs.ubuntu.com/maas/2.1/en/manage-cli#log-in-(required)'
 
-        self.maas = os.environ.get("API_MAAS_URL", None)
+        self.maas = os.environ.get("MAAS_API_URL", None)
         if not self.maas:
-            sys.exit("API_MAAS_URL environment variable not found. Set this to http<s>://<HOSTNAME or IP>/MAAS/api/{}".format(self.supported))
-        self.token = os.environ.get("API_MAAS_KEY", None)
+            sys.exit("MAAS_API_URL environment variable not found. Set this to http<s>://<HOSTNAME or IP>/MAAS/api/{}".format(self.supported))
+        self.token = os.environ.get("MAAS_API_KEY", None)
         if not self.token:
-            sys.exit("API_MAAS_KEY environment variable not found. See {} for getting a MAAS API KEY".format(self.apikeydocs))
+            sys.exit("MAAS_API_KEY environment variable not found. See {} for getting a MAAS API KEY".format(self.apikeydocs))
         self.args = None
 
         # Parse command line arguments
         self.cli_handler()
 
         if self.args.list:
-            print( json.dumps(self.inventory(), sort_keys=True, indent=2) )
+            print (json.dumps(self.inventory(), sort_keys=True, indent=2) )
         elif self.args.host:
             print( json.dumps(self.host(), sort_keys=True, indent=2) )
         elif self.args.nodes:
-            print( json.dumps(self.nodes(), sort_keys=True, indent=2) )
+            print ( json.dumps(self.nodes(), sort_keys=True, indent=2) )
         elif self.args.tags:
-            print( json.dumps(self.tags(), sort_keys=True, indent=2) )
+            print (json.dumps(self.tags(), sort_keys=True, indent=2) )
         elif self.args.tag:
-            print( json.dumps(self.tag(), sort_keys=True, indent=2) )
+            print (json.dumps(self.tag(), sort_keys=True, indent=2) )
         elif self.args.supported:
-            print( self.supported() )
+            print (self.supportedVersion() )
         else:
             sys.exit(1)
 
-    def supported(self):
+    def supportedVersion(self):
         """Display MAAS API version supported by this tool."""
         return self.supported
 
@@ -110,7 +119,6 @@ class Call_inventory:
         """Look up hosts by tag(s) and zone(s) and return a dict that Ansible will understand as an inventory."""
         tags = self.tags()
         ansible = {}
-        host_seen = []  # book keeping to ensure hosts are only listed once
         for tag in tags:
             headers = self.auth()
             url = "{}/tags/{}/?op=machines".format(self.maas.rstrip(), tag)
@@ -119,27 +127,26 @@ class Call_inventory:
             group_name = tag
             hosts = []
             for server in response:
-                if server['status_name'] == 'Deployed' and server['zone']['name'] == 'MGRAST':
-                            hosts.append(server['fqdn'])
-                            host_seen.append(server['fqdn']) # book keeping
-                            ansible[group_name] = {
-                                "hosts": hosts,
-                                "vars": {}
+                if server['status_name'] == 'Deployed':
+                    hosts.append(server['fqdn'])
+                    ansible[group_name] = {
+                        "hosts": hosts,
+                        "vars": {}
                     }
 
         nodes = self.nodes()
         hosts = []
         for node in nodes:
            zone = node['zone']['name']
-           if node['node_type_name'] != 'Machine' or node['status_name'] != 'Deployed' or zone != 'MGRAST' or node['fqdn'] in host_seen:
+           if node['node_type_name'] != 'Machine' or node['status_name'] != 'Deployed':
              continue
            hosts.append(node['fqdn'])
            ansible[zone] = {
-                "hosts": hosts,
+                "hosts": hosts,       
                 "vars": {}
            }
-        # PS 2018-05-24: Create metadata block for ansible (dynamic inventory)
-        # The below code gets a dump of all nodes provisioned by MAAS and then builds out a _meta JSON formated attribute.
+        # PS 2015-09-03: Create metadata block for Ansible's Dynamic Inventory
+        # The below code gets a dump of ALL nodes in MAAS and then builds out a _meta JSON attribute.
         # node_dump = self.nodes()
         # nodes = {
         #     '_meta': {
@@ -174,8 +181,8 @@ class Call_inventory:
 
     def cli_handler(self):
         """Manage command line options and arguments."""
-        parser = argparse.ArgumentParser(description='Dynamically produce an Ansible inventory from MAAS.', add_help=False)
-        parser.add_argument('-l', '--list', action='store_true', help='List instances by tag. (default)')
+        parser = argparse.ArgumentParser(description='Dynamically produce an Ansible inventory from Ubuntu MAAS.', add_help=False)
+        parser.add_argument('-l', '--list', action='store_true', help='List instances by tag.')
         parser.add_argument('-h', '--host', action='store', help='Get variables relating to a specific instance.')
         parser.add_argument('-n', '--nodes', action='store_true', help='List all nodes registered under MAAS.')
         parser.add_argument('-t', '--tags', action='store_true', help='List all tags registered under MAAS.')
@@ -183,7 +190,7 @@ class Call_inventory:
         parser.add_argument('-s', '--supported', action='store_true', help='List which MAAS API version are supported.')
         parser.add_argument('--help', action='help', help='Show this help message and exit.')
 
-        # print help when no arguments are given.
+        # Be kind and print help when no arguments given.
         if len(sys.argv)==1:
             parser.print_help()
             sys.exit(1)
@@ -191,4 +198,4 @@ class Call_inventory:
         self.args = parser.parse_args()
 
 if __name__ == "__main__":
-    Call_inventory()
+    Inventory()

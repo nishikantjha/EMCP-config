@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import configparser
@@ -13,7 +13,7 @@ import requests
 import requests_cache
 
 DEFAULTS = {
-    "group_machines_by": "tags",
+    "group_machines_by": "pool",
     "cache_filename": "ansible-maas-dynamics-inventory",
     "cache_path": "~/.ansible/tmp",
     "cache_max_age_in_seconds": 300,
