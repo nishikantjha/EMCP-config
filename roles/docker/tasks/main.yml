@@ -1,0 +1,186 @@
+---
+
+- name: remove old docker install
+  apt:
+    name: ['docker','docker-engine','docker.io','containerd','runc']
+    state: absent
+  tags: docker
+
+- name: Add Docker GPG key
+  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+  tags: docker
+
+- name: Create root user docker config directory
+  file:
+     path: /.docker
+     owner: root
+     group: root
+     mode: 0755
+     state: directory
+  tags: docker
+
+- name: Create systemd docker config directory
+  file:
+     path: /etc/systemd/system/docker.service.d
+     owner: root
+     group: root
+     mode: 0755
+     state: directory
+  tags: docker
+
+#  proxy settings for docker
+# ideally limit this to a whitelist
+- name: Docker container proxy config -- Configure proxy services for docker containers
+  copy:
+     content: |
+           {
+            "proxies":
+            {
+              "default":
+              {
+                "httpProxy": "{{ proxy_url }}"
+                "httpsProxy": "{{ proxy_url }}"
+              }
+            }
+           }
+     dest: "/root/.docker/config.json"
+     owner: root
+     group: root
+     mode: 0644
+     force: yes
+  tags: ['never', 'docker']
+
+# proxy settings for docker
+- name: Docker proxy config -- Configure proxy services for dockerd
+  copy:
+    content: |
+        [Service]
+        Environment="HTTP_PROXY={{ proxy_url | default('http://***REMOVED***:3128') }}"
+        Environment="HTTPS_PROXY={{ proxy_url | default('http://***REMOVED***:3128') }}"
+        Environment="NO_PROXY=127.0.0.0/8,10.0.0.0/8,cattle-system.svc,172.16.0.0/12,192.168.0.0/16"
+    dest: "/etc/systemd/system/docker.service.d/http-proxy.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  tags: docker
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+  tags: docker
+
+- name: Install new docker-ce
+  apt:
+    name: ['apt-transport-https','ca-certificates','curl','software-properties-common']
+    state: present
+    update_cache: yes
+  tags: docker
+
+- name: install docker-ce
+  apt: 
+    name: docker-ce=5:19.03.15~3-0~ubuntu-focal
+    state: present
+    force: yes
+  tags: docker
+
+- name: install docker-ce-cli
+  apt:
+    name: docker-ce-cli=5:19.03.15~3-0~ubuntu-focal
+    state: present
+    force: yes
+  tags: docker
+
+
+- name: adding existing user "{{ ansible_user }}" to group sudo
+  user:
+     name: "{{ ansible_user }}"
+     groups: docker
+     append: yes
+  become: yes
+  tags: docker
+
+- name: start dockerd and restart systemd
+  ansible.builtin.systemd:
+     daemon_reload: yes
+  tags: docker
+
+
+- name: Just force systemd to reread configs (2.4 and above)
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  tags: docker
+
+
+- name: Just force systemd to re-execute itself (2.8 and above)
+  ansible.builtin.systemd:
+    daemon_reexec: yes
+  tags: docker
+
+
+- name: restart docker
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+  tags: docker
+
+
+# per https://rancher.com/docs/rancher/v2.x/en/installation/install-rancher-on-linux/
+# setup rancherD
+
+
+- name: Create systemd docker config directory
+  file:
+     path: /etc/rancher/rke2
+     owner: root
+     group: root
+     mode: 0755
+     state: directory
+  tags: rancher
+
+- name: download kubectl
+  ansible.builtin.shell: curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+  args: 
+    warn: false
+  tags: rancher
+
+- name: install kubectl
+  ansible.builtin.shell: install -m 755 ./kubectl /usr/local/bin/
+  tags: rancher
+
+
+- name: download RKE
+  get_url:
+    url: https://github.com/rancher/rke/releases/download/v1.1.4/rke_linux-amd64
+    dest: /usr/local/bin/rke
+    mode: 0755
+  tags: rancher
+
+
+- name: download helm installer
+  get_url:
+    url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+    dest: /tmp/get_helm.sh
+    mode: 0755
+  tags: rancher
+
+- name: install helm
+  ansible.builtin.shell: bash /tmp/get_helm.sh
+  tags: rancher
+
+- name: enable rancherd-server.service
+  ansible.builtin.systemd:
+    name: rancherd-server.service
+    state: stopped
+    enabled: yes
+  tags: rancher
+
+  # check the info on proxy in
+  # https://rancher.com/docs/rancher/v1.5/en/installing-rancher/installing-server/#http-proxy
+
+- name: Set authorized key for user ubuntu copying it from current user
+  ansible.posix.authorized_key:
+    user: ubuntu
+    state: present
+    key: "{{ lookup('file', 'files/ikimk8s_rsa.pub') }}"
+
