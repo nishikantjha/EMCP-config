@@ -29,3 +29,14 @@
   roles:
     - docker
 
+
+- hosts: cluster
+  become: yes
+  ignore_errors: yes
+  remote_user: ubuntu
+  gather_facts: true
+  environment:
+      http_proxy: http://***REMOVED***:3128
+      https_proxy: http://***REMOVED***:3128
+  roles:
+    - nfs-client
