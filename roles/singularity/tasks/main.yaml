@@ -1,0 +1,58 @@
+# per https://sylabs.io/guides/3.0/user-guide/installation.html
+# setup singularity
+
+
+- name: install prequisites for 
+  apt:
+    name: build-essential 
+    state: latest
+    update_cache: yes
+  tags: singularity
+
+
+- name: install prequisites for 
+  apt:
+    name: libssl-dev
+    state: latest
+    update_cache: yes
+  tags: singularity
+ 
+- name: install prequisites for 
+  apt:
+    name:     uuid-dev 
+    state: latest
+    update_cache: yes
+  tags: singularity
+ 
+
+
+- name: install prequisites for
+  apt:
+    name:  libgpgme11-dev
+    state: latest
+    update_cache: yes
+  tags: singularity
+
+
+- name: install prequisites for
+  apt:
+    name:  squashfs-tools 
+    state: latest
+    update_cache: yes
+  tags: singularity
+
+
+- name: install prequisites for
+  apt:
+    name:   libseccomp-dev
+    state: latest
+    update_cache: yes
+  tags: singularity
+
+
+- name: install prequisites for
+  apt:
+    name:    pkg-config
+    state: latest
+    update_cache: yes
+  tags: singularity
