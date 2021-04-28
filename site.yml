@@ -16,6 +16,7 @@
   roles:
     - docker
     - rancher
+    - security
 
 
 - hosts: infra
@@ -28,8 +29,9 @@
       https_proxy: http://***REMOVED***:3128
   roles:
     - docker
+    - security
 
-- hosts: servers
+- hosts: server
   become: yes
   ignore_errors: yes
   remote_user: ubuntu
@@ -38,7 +40,7 @@
       http_proxy: http://***REMOVED***:3128
       https_proxy: http://***REMOVED***:3128
   roles:
-    - docker
+    - security
 
 
 - hosts: cluster
