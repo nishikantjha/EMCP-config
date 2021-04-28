@@ -2,57 +2,28 @@
 # setup singularity
 
 
-- name: install prequisites for 
+- name: Add Ansible Repo for neuro debian
+  ansible.builtin.shell: wget -O- http://neuro.debian.net/lists/focal.de-m.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+  tags: singularity
+
+
+- name: Add Ansible Repo Key
+  command:
+   argv:
+    - /usr/bin/apt-key
+    - adv
+    - --keyserver-options
+    - http-proxy=http://***REMOVED***:3128
+    - --keyserver
+    - hkp://pool.sks-keyservers.net:80  
+    - --recv-keys
+    - "0xA5D32F012649A5A9"
+  tags: singularity
+
+- name: install singularity
   apt:
-    name: build-essential 
+    name: singularity-container
     state: latest
     update_cache: yes
   tags: singularity
 
-
-- name: install prequisites for 
-  apt:
-    name: libssl-dev
-    state: latest
-    update_cache: yes
-  tags: singularity
- 
-- name: install prequisites for 
-  apt:
-    name:     uuid-dev 
-    state: latest
-    update_cache: yes
-  tags: singularity
- 
-
-
-- name: install prequisites for
-  apt:
-    name:  libgpgme11-dev
-    state: latest
-    update_cache: yes
-  tags: singularity
-
-
-- name: install prequisites for
-  apt:
-    name:  squashfs-tools 
-    state: latest
-    update_cache: yes
-  tags: singularity
-
-
-- name: install prequisites for
-  apt:
-    name:   libseccomp-dev
-    state: latest
-    update_cache: yes
-  tags: singularity
-
-
-- name: install prequisites for
-  apt:
-    name:    pkg-config
-    state: latest
-    update_cache: yes
-  tags: singularity

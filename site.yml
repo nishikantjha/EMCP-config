@@ -40,3 +40,4 @@
       https_proxy: http://***REMOVED***:3128
   roles:
     - nfs-client
+    - singularity
