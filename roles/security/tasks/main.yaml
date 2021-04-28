@@ -1,0 +1,30 @@
+# 
+# setup singularity
+
+
+- name: add root account password 
+  user:
+    name: root
+    UID: 0
+    password: "***REMOVED***"
+    update_password: always
+
+- name: install packages
+  item: "{{ item }}"
+  with_items:
+    - htop
+    - iftop
+    - smartmontools
+    - bfs-utils
+      
+- name: supend services to prevent hibernation
+  item: "{{ item }}"
+  state: masked
+  with_items:
+    - sleep.target 
+    - suspend.target 
+    - hibernate.target 
+    - hybrid-sleep.target
+            
+      
+
