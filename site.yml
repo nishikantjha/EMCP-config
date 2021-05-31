@@ -52,6 +52,7 @@
       http_proxy: http://***REMOVED***:3128
       https_proxy: http://***REMOVED***:3128
   roles:
+    - update
     - c-nodes
     - nfs-client
     - singularity
