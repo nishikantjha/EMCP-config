@@ -79,6 +79,8 @@
     - role: nvidia
       vars: 
         - nvidia_driver_ubuntu_branch: 460
+    - proxies
+    - miniconda
 
 
 - hosts: ipaserver
