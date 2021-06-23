@@ -1,0 +1,42 @@
+---
+- name: download miniconda
+  get_url:
+    url: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    dest: /tmp/install-miniconda.sh
+    mode: 0755
+
+- name: create conda folder
+  become: True
+  file:
+    path: /opt/miniconda
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: run miniconda installer
+  shell: /tmp/install-miniconda.sh -b -u -p /opt/miniconda
+
+- name: remove miniconda installer
+  file:
+    state: absent
+    path: /tmp/install-miniconda.sh
+
+- name: add to path
+  become: True
+  copy:
+    dest: "/etc/profile.d/miniconda.sh"
+    content: |
+      export PATH=/opt/miniconda/bin:$PATH
+
+# - name: add PATH and initialize
+#   shell: export PATH=/opt/miniconda/bin:$PATH && conda init
+#   args:
+#     executable: /bin/bash
+
+- name: miniconda +r+x for all
+  become: True
+  file:
+    path: /opt/miniconda
+    mode: 0755
+    recurse: yes
+  
