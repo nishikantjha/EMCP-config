@@ -72,10 +72,13 @@
       https_proxy: http://***REMOVED***:3128
   roles:
     - update
-    - g-nodes
     - nfs-client
+    - g-nodes
     - docker
     - security
+    - role: nvidia-driver
+      vars: 
+        - nvidia_driver_ubuntu_branch: 460
 
 
 - hosts: ipaserver
