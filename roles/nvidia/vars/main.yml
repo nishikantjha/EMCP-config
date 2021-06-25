@@ -1,2 +1,4 @@
-_ubuntu_repo_dir: "{{ ansible_distribution | lower }}{{ ansible_distribution_version | replace('.', '') }}/{{ ansible_architecture }}"
-_rhel_repo_dir: "rhel{{ ansible_distribution_major_version }}/{{ ansible_architecture }}"
+cuda_package_name: "cuda-{{ cuda_version | replace('.', '-') }}"
+cudnn_package_spec: "{{ cudnn_base_name }}={{ cudnn_version }}-1+cuda{{ cuda_version }}"
+cudnn_dev_package_spec: "{{ cudnn_base_name }}-dev={{ cudnn_version }}-1+cuda{{ cuda_version }}"
+cudnn_samples_glob: "{{ cudnn_base_name }}-samples_*.deb"

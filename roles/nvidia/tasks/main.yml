@@ -1,52 +1,95 @@
----
-- name: unload nouveau
-  modprobe:
-    name: nouveau
-    state: absent
-  ignore_errors: true
+- name: Install drivers and libraries
+  block:
+  - name: Driver and cuda toolkit
+    vars:
+      nvidia_driver_ubuntu_install_from_cuda_repo: true
+      nvidia_driver_ubuntu_cuda_package: "{{ cuda_package_name }}"
+    include_role:
+      name: nvidia.nvidia_driver
 
-- name: ubuntu install tasks (canonical repos)
-  include_tasks: install-ubuntu.yml
-  when: ansible_distribution == 'Ubuntu' and (not nvidia_driver_ubuntu_install_from_cuda_repo)
+  - name: Test the driver installation
+    ansible.builtin.command: /usr/bin/nvidia-smi
+    changed_when: false
 
-- name: ubuntu install tasks (CUDA repo)
-  include_tasks: install-ubuntu-cuda-repo.yml
-  when: ansible_distribution == 'Ubuntu' and nvidia_driver_ubuntu_install_from_cuda_repo
+  - name: Install the container runtime
+    include_role:
+      name: nvidia.nvidia_docker
 
-- name: redhat family install tasks
-  include_tasks: install-redhat.yml
-  when: ansible_os_family == 'RedHat'
+  - name: Install cuDNN
+    ansible.builtin.apt:
+      name:
+        - "{{ cudnn_package_spec }}"
+        - "{{ cudnn_dev_package_spec }}"
+      state: present
+  tags: nvidia-install
 
-- name: create persistenced override dir
-  file:
-    path: /etc/systemd/system/nvidia-persistenced.service.d/
-    state: directory
-    recurse: yes
+# Downloading the libcudnn samples requires an NVIDIA Developer Program Membership.
+- name: Install libcudnn samples
+  block:
+  - name: Create a temp directory
+    ansible.builtin.tempfile:
+      suffix: cudnnsamplespackage
+      state: directory
+    register: samples_package_dir
 
-- name: configure persistenced service to turn on persistence mode
-  copy:
-    src: nvidia-persistenced-override.conf
-    dest: /etc/systemd/system/nvidia-persistenced.service.d/override.conf
-  when: nvidia_driver_persistence_mode_on
+  - name: Copy the package
+    ansible.builtin.copy:
+      src: "{{ lookup('fileglob', cudnn_samples_glob) }}"
+      dest: "{{ samples_package_dir.path }}/"
+    register: deb_path
+    when: samples_package_dir.path is defined
 
-- name: remove persistenced service override
-  file:
-    path: /etc/systemd/system/nvidia-persistenced.service.d/override.conf
-    state: absent
-  when: not nvidia_driver_persistence_mode_on
+  - name: Install the samples package
+    ansible.builtin.apt:
+      deb: "{{ deb_path.dest }}"
+    when: deb_path.dest is defined
 
-- name: enable persistenced
-  systemd:
-    name: nvidia-persistenced
-    enabled: yes
-  when: nvidia_driver_package_state != 'absent'
+  - name: Remove the temp directory
+    ansible.builtin.file:
+      path: "{{ samples_package_dir.path }}"
+      state: absent
+    when: samples_package_dir.path is defined
 
-- name: set module parameters
-  template:
-    src: nvidia.conf.j2
-    dest: "{{ nvidia_driver_module_file }}"
-    mode: '0644'
+  - name: Install the libfreeimage-dev dependency
+    ansible.builtin.apt:
+      name: libfreeimage-dev
+  tags: nvidia-cudnn-verify
 
-- name: reboot after driver install
-  reboot:
-  when: install_driver.changed and not nvidia_driver_skip_reboot
+# Verification step as described at
+# https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html#verify
+- name: Verify the cuDNN installation
+  become: false
+  block:
+  - name: Create a temp directory
+    ansible.builtin.tempfile:
+      suffix: cudnnsamplebuild
+      state: directory
+    register: cudnn_build_dir
+
+  - name: Copy the cuDNN sample project
+    ansible.builtin.copy:
+      src: /usr/src/cudnn_samples_v8/
+      dest: "{{ cudnn_build_dir.path }}/"
+      remote_src: yes
+    when: cudnn_build_dir.path is defined
+
+  - name: Compile the cuDNN sample project
+    ansible.builtin.command:
+      cmd: /usr/bin/make
+      chdir: "{{ cudnn_build_dir.path }}/mnistCUDNN"
+    changed_when: false
+    when: cudnn_build_dir.path is defined
+
+  - name: Run the compiled executable
+    ansible.builtin.command:
+      cmd: ./mnistCUDNN
+      chdir: "{{ cudnn_build_dir.path }}/mnistCUDNN"
+    changed_when: false
+    when: cudnn_build_dir.path is defined
+
+  - name: Remove the temp directory
+    ansible.builtin.file:
+      path: "{{ cudnn_build_dir.path }}"
+      state: absent
+    when: cudnn_build_dir.path is defined
+  tags: nvidia-cudnn-verify

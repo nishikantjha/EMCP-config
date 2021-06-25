@@ -76,9 +76,7 @@
     - g-nodes
     - docker
     - security
-    - role: nvidia
-      vars: 
-        - nvidia_driver_ubuntu_branch: 460
+    - nvidia
     - proxies
     - miniconda
 
