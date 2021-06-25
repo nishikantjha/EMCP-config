@@ -61,7 +61,7 @@
     - security
 
 
-- hosts: g-cluster
+- hosts: gpucluster
   become: yes
   ignore_errors: yes
   remote_user: ubuntu
@@ -77,7 +77,7 @@
     - security
 
 
-- hosts: ipa-server
+- hosts: ipaserver
   become: yes
   ignore_errors: yes
   remote_user: ubuntu
