@@ -38,7 +38,7 @@
             {
               "default":
               {
-                "httpProxy": "{{ proxy_url }}"
+                "httpProxy": "{{ proxy_url }}",
                 "httpsProxy": "{{ proxy_url }}"
               }
             }

@@ -13,6 +13,8 @@
   environment:
       http_proxy: http://***REMOVED***:3128
       https_proxy: http://***REMOVED***:3128
+      KUBECONFIG: kube_config_ikimk8s.yaml
+
   roles:
     - docker
     - rancher
