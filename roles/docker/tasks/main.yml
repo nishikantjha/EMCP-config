@@ -31,18 +31,8 @@
 #  proxy settings for docker
 # ideally limit this to a whitelist
 - name: Docker container proxy config -- Configure proxy services for docker containers
-  copy:
-     content: |
-           {
-            "proxies":
-            {
-              "default":
-              {
-                "httpProxy": "{{ proxy_url }}",
-                "httpsProxy": "{{ proxy_url }}"
-              }
-            }
-           }
+  template:
+     src: "docker-config.json.j2"
      dest: "/root/.docker/config.json"
      owner: root
      group: root
@@ -98,6 +88,42 @@
      groups: docker
      append: yes
   become: yes
+  register: user_info
+  tags: docker
+
+- name: Create a user-specific Docker settings directory for "{{ ansible_user }}"
+  file:
+     path: "{{ user_info.home }}/.docker"
+     owner: "{{ user_info.name }}"
+     group: "{{ user_info.group }}"
+     mode: 0755
+     state: directory
+  tags: docker
+
+- name: Test whether a Docker configuration file already exists for "{{ ansible_user }}"
+  stat:
+     path: "{{ user_info.home }}/.docker/config.json"
+  register: docker_config_file
+  tags: docker
+
+- name: Read the Docker configuration file of "{{ ansible_user }}" if it exists
+  slurp:
+     src: "{{ docker_config_file.stat.path }}"
+  register: docker_config
+  when: docker_config_file.stat.exists
+  tags: docker
+
+- name: Add proxy settings for Docker containers
+  copy:
+     content: "{{ docker_existing_config | combine(docker_proxy_config, recursive=True) | to_nice_json(ensure_ascii=False) }}"
+     dest: "{{ user_info.home }}/.docker/config.json"
+     owner: "{{ user_info.name }}"
+     group: "{{ user_info.group }}"
+     mode: 0644
+     force: yes
+  vars:
+     docker_existing_config: "{{ docker_config.content | default('{}' | b64encode) | b64decode | from_json }}"
+     docker_proxy_config: "{{ lookup('template', 'docker-config.json.j2', convert_data=False) | from_json }}"
   tags: docker
 
 - name: start dockerd and restart systemd
