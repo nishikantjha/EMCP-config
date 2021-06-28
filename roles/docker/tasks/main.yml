@@ -12,7 +12,7 @@
 
 - name: Create root user docker config directory
   file:
-     path: /.docker
+     path: /root/.docker
      owner: root
      group: root
      mode: 0755
