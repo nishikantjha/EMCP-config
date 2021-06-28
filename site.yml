@@ -13,12 +13,8 @@
   environment:
       http_proxy: http://***REMOVED***:3128
       https_proxy: http://***REMOVED***:3128
-<<<<<<< HEAD
       KUBECONFIG: kube_config_ikimk8s.yaml
-
-=======
       no_proxy: "127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,cattle-system.svc"
->>>>>>> 3426de4b5c2d65975e4bceef27857b6d01842d85
   roles:
     - update
     - docker
@@ -66,7 +62,7 @@
     - security
 
 
-- hosts: g-cluster
+- hosts: gpucluster
   become: yes
   ignore_errors: yes
   remote_user: ubuntu
@@ -82,7 +78,7 @@
     - security
 
 
-- hosts: ipa-server
+- hosts: ipaserver
   become: yes
   ignore_errors: yes
   remote_user: ubuntu
