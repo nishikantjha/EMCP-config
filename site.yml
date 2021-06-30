@@ -72,10 +72,13 @@
       https_proxy: http://***REMOVED***:3128
   roles:
     - update
-    - g-nodes
     - nfs-client
+    - g-nodes
     - docker
     - security
+    - nvidia
+    - proxies
+    - miniconda
 
 
 - hosts: ipaserver
