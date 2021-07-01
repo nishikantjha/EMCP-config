@@ -60,6 +60,7 @@
     - nfs-client
     - singularity
     - security
+    - ssh-config
 
 
 - hosts: gpucluster
@@ -79,6 +80,7 @@
     - nvidia
     - proxies
     - miniconda
+    - ssh-config
 
 
 - hosts: ipaserver
@@ -91,4 +93,3 @@
       https_proxy: http://***REMOVED***:3128
   roles:
     - ipa-server
-
