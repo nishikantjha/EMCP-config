@@ -22,28 +22,13 @@
     - smartmontools
   tags: admin-tools
         
-- name: supend services to prevent hibernation
+- name: Prevent sleep and hibernation
   ansible.builtin.systemd:
-    name: sleep,target
+    name: "{{ item }}"
     masked: yes
+  loop:
+    - sleep.target
+    - suspend.target
+    - hibernate.target
+    - hybrid-sleep.target
   tags: no-hibernation
-        
-
-- name: supend services to prevent hibernation
-  ansible.builtin.systemd:
-    name: suspend.target
-    masked: yes
-  tags: no-hibernation
-
-- name: supend services to prevent hibernation
-  ansible.builtin.systemd:
-    name: hibernate.target
-    masked: yes
-  tags: no-hibernation
-
-- name: supend services to prevent hibernation
-  ansible.builtin.systemd:
-    name: hybrid-sleep.target
-    masked: yes
-  tags: no-hibernation
-
