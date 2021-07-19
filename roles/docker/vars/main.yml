@@ -1,8 +1,7 @@
 # use variable awe_state to set awe worker status (default started) OPTONS: restarted, stopped
 # use variable awe_server_url to overwrite (default awe.mg-rast.org)
-# use variable proxy_url to specify an alternate proxy (default "http://172-20-0-0--20.maas-internal:8000")
+# use variable http_proxy to specify an alternate proxy (default "http://172-20-0-0--20.maas-internal:8000")
 # use default_gw to set default IP gateway (default: 172.20.5.198)
 
 ---
-  proxy_url: "http://***REMOVED***:3128"
   gather_facts: yes 
