@@ -1,0 +1,74 @@
+---
+- name: Create the storage directory
+  ansible.builtin.file:
+    path: "{{ ipa_storage }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  notify: activate server via systemd
+  tags: freeIPA-server
+
+- name: Create the installation argument file
+  no_log: true
+  block:
+  - name: Load the password variables
+    include_vars: secrets.yml
+
+  - name: Copy the installation argument file
+    ansible.builtin.template:
+      src: "{{ server_options_filename }}.j2"
+      dest: "{{ server_options_path }}"
+      owner: root
+      group: root
+      mode: 0600
+  notify: activate server via systemd
+  tags: freeIPA-server
+
+- name: Obtain information about network interfaces from resolvectl
+  ansible.builtin.command: resolvectl default-route
+  changed_when: false
+  register: resolvectl_command
+  tags: freeIPA-server
+
+- name: Copy the systemd service file
+  vars:
+    # Obtain the name of the interface designated as default route by resolvectl.
+    dns_interfaces: "{{ resolvectl_command['stdout'] | regex_findall(resolvectl_regex) }}"
+    # Obtain the IPv4 address associated with the default DNS interface.
+    ipa_server_ipv4: "{{ dns_interfaces | ternary(ansible_facts[dns_interfaces[0]]['ipv4']['address'], ansible_facts['default_ipv4']) }}"
+  ansible.builtin.template:
+    src: "{{ server_service_name }}.service.j2"
+    dest: "/etc/systemd/system/{{ server_service_name }}.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify: activate server via systemd
+  when: resolvectl_command is defined
+  tags: freeIPA-server
+
+- name: Copy the ufw configuration file
+  ansible.builtin.template:
+    src: "{{ server_service_name }}.ufw.j2"
+    dest: "/etc/ufw/applications.d/{{ server_service_name }}"
+    owner: root
+    group: root
+    mode: 0644
+  tags: freeIPA-server
+
+- name: Enable ufw
+  community.general.ufw:
+    state: enabled
+  tags: freeIPA-server
+
+- name: Enable the ssh profile in ufw
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH
+  tags: freeIPA-server
+
+- name: Enable the FreeIPA profile in ufw
+  community.general.ufw:
+    rule: allow
+    name: "{{ server_service_name }}"
+  tags: freeIPA-server

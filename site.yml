@@ -92,4 +92,8 @@
       http_proxy: http://***REMOVED***:3128
       https_proxy: http://***REMOVED***:3128
   roles:
-    - ipa-server
+    - update
+    - security
+    - proxies
+    - docker
+    - ipaserver
