@@ -42,12 +42,8 @@
 
 # proxy settings for docker
 - name: Docker proxy config -- Configure proxy services for dockerd
-  copy:
-    content: |
-        [Service]
-        Environment="HTTP_PROXY={{ proxy_url | default('http://***REMOVED***:3128') }}"
-        Environment="HTTPS_PROXY={{ proxy_url | default('http://***REMOVED***:3128') }}"
-        Environment="NO_PROXY=127.0.0.0/8,10.0.0.0/8,cattle-system.svc,172.16.0.0/12,192.168.0.0/16"
+  template:
+    src: "systemd-http-proxy.conf.j2"
     dest: "/etc/systemd/system/docker.service.d/http-proxy.conf"
     owner: root
     group: root

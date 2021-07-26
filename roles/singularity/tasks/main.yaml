@@ -13,7 +13,7 @@
     - /usr/bin/apt-key
     - adv
     - --keyserver-options
-    - http-proxy=http://***REMOVED***:3128
+    - "http-proxy={{ http_proxy }}"
     - --keyserver
     - hkp://pool.sks-keyservers.net:80  
     - --recv-keys

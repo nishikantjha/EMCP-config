@@ -1,8 +1,7 @@
 ---
 - name: IKIM Proxies
-  become: yes
-  copy:
-    dest: "/etc/profile.d/proxy.sh"
-    content: |
-      export http_proxy=http://***REMOVED***:3128
-      export https_proxy=http://***REMOVED***:3128
+  ansible.builtin.template:
+    src: http-proxy-profile.sh.j2
+    dest: /etc/profile.d/proxy.sh
+  tags:
+    - proxy
