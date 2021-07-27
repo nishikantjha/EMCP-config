@@ -76,6 +76,8 @@
   ignore_errors: yes
   remote_user: ubuntu
   gather_facts: true
+  vars_files:
+    - vars/secrets.yml
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - update

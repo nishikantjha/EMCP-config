@@ -9,19 +9,13 @@
   notify: activate server via systemd
   tags: freeIPA-server
 
-- name: Create the installation argument file
-  no_log: true
-  block:
-  - name: Load the password variables
-    include_vars: secrets.yml
-
-  - name: Copy the installation argument file
-    ansible.builtin.template:
-      src: "{{ server_options_filename }}.j2"
-      dest: "{{ server_options_path }}"
-      owner: root
-      group: root
-      mode: 0600
+- name: Copy the installation argument file
+  ansible.builtin.template:
+    src: "{{ server_options_filename }}.j2"
+    dest: "{{ server_options_path }}"
+    owner: root
+    group: root
+    mode: 0600
   notify: activate server via systemd
   tags: freeIPA-server
 
