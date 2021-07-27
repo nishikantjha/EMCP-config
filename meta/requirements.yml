@@ -2,3 +2,6 @@
 roles:
   - nvidia.nvidia_driver
   - nvidia.nvidia_docker
+
+collections:
+  - community.general
