@@ -5,3 +5,4 @@ roles:
 
 collections:
   - community.general
+  - freeipa.ansible_freeipa
