@@ -47,6 +47,14 @@
   when: resolvectl_command is defined
   tags: freeIPA-server
 
+- name: Schedule the systemd service for restart if not currently running
+  ansible.builtin.command: "systemctl is-active {{ server_service_name }}"
+  register: server_running
+  changed_when: server_running is failed
+  failed_when: false
+  notify: activate server via systemd
+  tags: freeIPA-server
+
 - name: Copy the ufw configuration file
   ansible.builtin.template:
     src: "{{ server_service_name }}.ufw.j2"
