@@ -1,5 +1,5 @@
-# Sensitive information
-**/vars/secrets.yml
+# Ansible Vault password file
+vault-pass
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
