@@ -83,6 +83,7 @@
     - proxies
     - docker
     - ipaserver
+    - users
 
 
 - hosts: ipaclients

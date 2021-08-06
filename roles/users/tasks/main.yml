@@ -1,0 +1,13 @@
+---
+- name: Install dependencies
+  ansible.builtin.apt:
+    name: "{{ ipaclient_package }}"
+    state: present
+  tags: users
+
+- name: Create users
+  freeipa.ansible_freeipa.ipauser:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    users: "{{ ipausers }}"
+    state: present
+  tags: users
