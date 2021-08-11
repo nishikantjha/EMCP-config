@@ -1,7 +1,13 @@
 ---
 - name: Create users
-  freeipa.ansible_freeipa.ipauser:
-    ipaadmin_password: "{{ ipaadmin_password }}"
-    users: "{{ ipausers }}"
+  community.general.ipa_user:
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    name: "{{ item['name'] }}"
+    givenname: "{{ item['givenname'] | default(omit) }}"
+    sn: "{{ item['sn'] | default(omit) }}"
+    loginshell: "{{ item['loginshell'] | default(default_shell) }}"
+    sshpubkey: "{{ item['sshpubkey'] }}"
     state: present
-  tags: users
+  loop: "{{ ipausers }}"
+  tags: ipausers
