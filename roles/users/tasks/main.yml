@@ -8,6 +8,7 @@
     sn: "{{ item['sn'] | default(omit) }}"
     loginshell: "{{ item['loginshell'] | default(default_shell) }}"
     sshpubkey: "{{ item['sshpubkey'] }}"
+    validate_certs: no
     state: present
   loop: "{{ ipausers }}"
   tags: ipausers
