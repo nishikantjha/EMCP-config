@@ -14,8 +14,7 @@ ExecStart=/usr/bin/docker run -t --name {{ server_container_name }} \
 	-v "{{ ipa_storage }}:/data" \
 	-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 	--sysctl net.ipv6.conf.all.disable_ipv6=0 \
-	-h "{{ ansible_facts['fqdn'] }}" \
-	-e IPA_SERVER_IP={{ ipa_server_ipv4 }} \
+	-h "{{ inventory_hostname }}" \
 {% for portspec in ipa_server_ports %}
 	-p {{ portspec | regex_search('^[0-9]+') }}:{{ portspec }} \
 {% endfor %}

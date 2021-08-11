@@ -26,11 +26,6 @@
   tags: freeIPA-server
 
 - name: Copy the systemd service file
-  vars:
-    # Obtain the name of the interface designated as default route by resolvectl.
-    dns_interfaces: "{{ resolvectl_command['stdout'] | regex_findall(resolvectl_regex) }}"
-    # Obtain the IPv4 address associated with the default DNS interface.
-    ipa_server_ipv4: "{{ dns_interfaces | ternary(ansible_facts[dns_interfaces[0]]['ipv4']['address'], ansible_facts['default_ipv4']) }}"
   ansible.builtin.template:
     src: "{{ server_service_name }}.service.j2"
     dest: "/etc/systemd/system/{{ server_service_name }}.service"
