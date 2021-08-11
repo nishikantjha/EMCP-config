@@ -39,6 +39,7 @@
      mode: 0644
      force: yes
   tags: ['never', 'docker']
+  notify: restart docker unit
 
 # proxy settings for docker
 - name: Docker proxy config -- Configure proxy services for dockerd
@@ -50,6 +51,7 @@
     mode: 0644
     force: yes
   tags: docker
+  notify: restart docker unit
 
 - name: Add Docker APT repository
   apt_repository:
@@ -71,6 +73,7 @@
     state: present
     force: yes
   tags: docker
+  notify: restart docker unit
 
 - name: adding existing user "{{ ansible_user }}" to group sudo
   user:
@@ -80,6 +83,7 @@
   become: yes
   register: user_info
   tags: docker
+  notify: restart docker unit
 
 - name: Create a user-specific Docker settings directory for "{{ ansible_user }}"
   file:
@@ -115,29 +119,14 @@
      docker_existing_config: "{{ docker_config.content | default('{}' | b64encode) | b64decode | from_json }}"
      docker_proxy_config: "{{ lookup('template', 'docker-config.json.j2', convert_data=False) | from_json }}"
   tags: docker
-
-- name: start dockerd and restart systemd
-  ansible.builtin.systemd:
-     daemon_reload: yes
-  tags: docker
-
+  notify: restart docker unit
 
 - name: Just force systemd to reread configs (2.4 and above)
   ansible.builtin.systemd:
     daemon_reload: yes
   tags: docker
 
-
 - name: Just force systemd to re-execute itself (2.8 and above)
   ansible.builtin.systemd:
     daemon_reexec: yes
   tags: docker
-
-
-- name: restart docker
-  ansible.builtin.systemd:
-    name: docker
-    state: restarted
-  tags: docker
-
-

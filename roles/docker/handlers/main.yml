@@ -1,0 +1,7 @@
+---
+
+- name: restart docker unit
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+  tags: docker
