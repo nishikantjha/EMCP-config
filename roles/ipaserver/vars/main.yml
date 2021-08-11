@@ -15,7 +15,5 @@ ipa_server_ports:
   - "88/udp"
   - "464/tcp"
   - "464/udp"
-  # NTP
-  - "123/udp"
 
 resolvectl_regex: "Link.+\\((.+)\\): yes"
