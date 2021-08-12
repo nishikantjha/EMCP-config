@@ -2,11 +2,6 @@
 # https://github.com/systemd/systemd/blob/main/docs/UIDS-GIDS.md
 subid_step: 65536
 
-# Allocate subordinate IDs for the first 4096 IPA users. This is an arbitrary
-# value that should cover all the actual users while leaving some IDs
-# purposefully unused.
-mappable_users_cap: 4096
-
 # Set 2^32-1 as the hard exclusive cap for ID numbers, putting the last usable
 # subid at 2^32-2.
 subid_cap: 4294967295
