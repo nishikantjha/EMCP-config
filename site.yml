@@ -98,15 +98,4 @@
     - role: freeipa.ansible_freeipa.ipaclient
       state: present
       tags: freeIPA-client
-
-
-- hosts: ipaclients[0]
-  become: yes
-  ignore_errors: yes
-  remote_user: ubuntu
-  gather_facts: true
-  environment: "{{ proxy_env | default({}) }}"
-  roles:
-    - update
-    - security
     - users

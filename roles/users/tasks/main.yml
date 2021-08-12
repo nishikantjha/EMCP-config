@@ -11,4 +11,5 @@
     validate_certs: no
     state: present
   loop: "{{ ipausers }}"
+  run_once: true
   tags: ipausers
