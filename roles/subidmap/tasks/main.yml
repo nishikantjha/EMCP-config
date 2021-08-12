@@ -57,23 +57,40 @@
     when:
       - subid_stop is defined
       - subid_stop|int > subid_cap
+
+  - name: Create a local temp file
+    become: false
+    local_action:
+      module: ansible.builtin.tempfile
+      suffix: subidmap
+      state: file
+    register: sub_id_file
+    notify: remove temp file
+
+  # Create subordinate uid and gid mappings such that first_ipa_id is mapped to
+  # a range that starts at subid_start, proceeding until subid_stop is reached.
+  - name: Write the mapping file
+    become: false
+    local_action:
+      module: ansible.builtin.template
+      src: "subid.j2"
+      dest: "{{ sub_id_file['path'] }}"
+    when:
+      - sub_id_file['path'] is defined
+      - first_ipa_id is defined
+      - subid_start is defined
+      - subid_stop is defined
   run_once: true
   tags: subidmap
 
-# Create subordinate uid and gid mappings such that every possible IPA user
-# starting from the first IPA ID is mapped to subordinate IDs outside of the
-# IPA range. Stop before reaching the limit of 2^32-2.
-- name: Preallocate subuid and subgid mappings for all possible IPA users
-  ansible.builtin.template:
-    src: "subid.j2"
+- name: Copy the mapping file to the target hosts.
+  ansible.builtin.copy:
+    src: "{{ sub_id_file['path'] }}"
     dest: "{{ item }}"
     owner: root
     group: root
     mode: 0644
-  when:
-    - first_ipa_id is defined
-    - subid_start is defined
-    - subid_stop is defined
+  when: sub_id_file['path'] is defined
   loop:
     - /etc/subuid
     - /etc/subgid

@@ -1,0 +1,5 @@
+---
+- name: remove temp file
+  ansible.builtin.file:
+    path: "{{ sub_id_file['path'] }}"
+    state: absent
