@@ -1,0 +1,56 @@
+- name: Obtain a ticket using the default keytab on the current client
+  ansible.builtin.command: kinit -k
+
+- name: Query the server
+  ansible.builtin.command: ipa idrange-find
+  changed_when: false
+  register: idrange_command
+
+- name: Extract the first allocated IPA ID and the number of possible IPA IDs
+  vars:
+    parsed_ints: "{{ idrange_command['stdout'] | regex_findall('range: (\\d+)') }}"
+  ansible.builtin.set_fact:
+    first_ipa_id: "{{ parsed_ints[0] }}"
+    ipa_range_size: "{{ parsed_ints[1] }}"
+  when: idrange_command['stdout'] is defined
+
+- name: Calculate the last possible IPA ID
+  ansible.builtin.set_fact:
+    last_ipa_id: "{{ first_ipa_id|int + ipa_range_size|int - 1 }}"
+  when:
+    - first_ipa_id is defined
+    - ipa_range_size is defined
+
+# Find a suitable value for the first subordinate ID by looping through the
+# values 2^27, 2^28, 2^29, 2^30, 2^31 until a value greater than all possible
+# IPA IDs is found. This represents an arbitrary starting point in the
+# "Container UID range" defined by systemd
+# (https://github.com/systemd/systemd/blob/main/docs/UIDS-GIDS.md)
+# such that the range is not entirely used up while leaving enough room for
+# subordinate IDs.
+- name: Find a suitable value for the first subordinate ID
+  ansible.builtin.set_fact:
+    subid_start: "{{ item }}"
+  when:
+    - last_ipa_id is defined
+    - item > last_ipa_id|int
+  loop:
+    - 2147483648
+    - 1073741824
+    - 536870912
+    - 268435456
+    - 134217728
+
+# As the last preallocated subordinate ID, pick a value which covers a number
+# of users defined by mappable_users_cap.
+- name: Find a suitable value for the last subordinate ID
+  ansible.builtin.set_fact:
+    subid_stop: "{{ subid_start|int + mappable_users_cap*subid_step }}"
+  when: subid_start is defined
+
+- name: Make sure that the last subordinate ID does not overflow
+  ansible.builtin.set_fact:
+    subid_stop: "{{ subid_cap }}"
+  when:
+    - subid_stop is defined
+    - subid_stop|int > subid_cap

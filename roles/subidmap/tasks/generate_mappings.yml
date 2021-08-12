@@ -1,0 +1,20 @@
+- name: Create a local temp file
+  local_action:
+    module: ansible.builtin.tempfile
+    suffix: subidmap
+    state: file
+  register: sub_id_file
+  notify: remove temp file
+
+# Create subordinate uid and gid mappings such that first_ipa_id is mapped to
+# a range that starts at subid_start, proceeding until subid_stop is reached.
+- name: Write the mapping file
+  local_action:
+    module: ansible.builtin.template
+    src: "subid.j2"
+    dest: "{{ sub_id_file['path'] }}"
+  when:
+    - sub_id_file['path'] is defined
+    - first_ipa_id is defined
+    - subid_start is defined
+    - subid_stop is defined
