@@ -6,6 +6,7 @@
     name: "{{ item['name'] }}"
     givenname: "{{ item['givenname'] | default(omit) }}"
     sn: "{{ item['sn'] | default(omit) }}"
+    mail: "{{ item['email'] | default(omit) }}"
     loginshell: "{{ item['loginshell'] | default(default_shell) }}"
     sshpubkey: "{{ item['sshpubkey'] }}"
     validate_certs: no
