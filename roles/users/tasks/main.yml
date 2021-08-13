@@ -8,7 +8,7 @@
     sn: "{{ item['sn'] | default(omit) }}"
     mail: "{{ item['email'] | default(omit) }}"
     loginshell: "{{ item['loginshell'] | default(default_shell) }}"
-    sshpubkey: "{{ item['sshpubkey'] }}"
+    sshpubkey: "{{ item['sshpubkey'] | default(omit) }}"
     validate_certs: no
     state: present
   loop: "{{ ipausers }}"
