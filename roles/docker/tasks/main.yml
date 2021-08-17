@@ -2,7 +2,7 @@
 
 - name: remove old docker install
   apt:
-    name: ['docker','docker-engine','docker.io','containerd','runc']
+    name: ['docker', 'docker-engine', 'docker.io', 'containerd', 'runc']
     state: absent
   tags: docker
 
@@ -60,7 +60,7 @@
 
 - name: Install new docker-ce
   apt:
-    name: ['apt-transport-https','ca-certificates','curl','software-properties-common']
+    name: ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common']
     state: present
     update_cache: true
   tags: docker

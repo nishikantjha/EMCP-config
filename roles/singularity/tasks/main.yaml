@@ -8,14 +8,14 @@
 - name: Add Ansible Repo Key
   command:
     argv:
-    - /usr/bin/apt-key
-    - adv
-    - --keyserver-options
-    - "http-proxy={{ http_proxy }}"
-    - --keyserver
-    - hkp://pool.sks-keyservers.net:80
-    - --recv-keys
-    - "0xA5D32F012649A5A9"
+      - /usr/bin/apt-key
+      - adv
+      - --keyserver-options
+      - "http-proxy={{ http_proxy }}"
+      - --keyserver
+      - hkp://pool.sks-keyservers.net:80
+      - --recv-keys
+      - "0xA5D32F012649A5A9"
   tags: singularity
 
 - name: install singularity
