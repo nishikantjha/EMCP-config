@@ -39,4 +39,3 @@
     path: /opt/miniconda
     mode: 0755
     recurse: yes
-  

@@ -23,7 +23,3 @@
     test_command: uptime
   when: reboot_required_file.stat.exists
   tags: update
-
-
-
-
