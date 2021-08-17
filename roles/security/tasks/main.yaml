@@ -1,4 +1,4 @@
-# 
+#
 # setup security
 #
 # add root password as backdoor for console
@@ -6,7 +6,7 @@
 # install admin tools
 
 
-- name: add root account password 
+- name: add root account password
   ansible.builtin.user:
     name: root
     uid: 0
@@ -16,12 +16,12 @@
 
 - name: install packages
   apt:
-    pkg: 
+    pkg:
     - htop
     - iftop
     - smartmontools
   tags: admin-tools
-        
+
 - name: Prevent sleep and hibernation
   ansible.builtin.systemd:
     name: "{{ item }}"

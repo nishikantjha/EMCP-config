@@ -15,7 +15,7 @@
     - --keyserver-options
     - "http-proxy={{ http_proxy }}"
     - --keyserver
-    - hkp://pool.sks-keyservers.net:80  
+    - hkp://pool.sks-keyservers.net:80
     - --recv-keys
     - "0xA5D32F012649A5A9"
   tags: singularity
