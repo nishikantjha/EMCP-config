@@ -25,7 +25,7 @@
 - name: Prevent sleep and hibernation
   ansible.builtin.systemd:
     name: "{{ item }}"
-    masked: yes
+    masked: true
   loop:
     - sleep.target
     - suspend.target

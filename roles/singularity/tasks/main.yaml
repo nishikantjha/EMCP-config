@@ -22,5 +22,5 @@
   apt:
     name: singularity-container
     state: latest
-    update_cache: yes
+    update_cache: true
   tags: singularity

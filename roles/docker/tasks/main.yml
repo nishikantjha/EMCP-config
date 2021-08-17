@@ -37,7 +37,7 @@
      owner: root
      group: root
      mode: 0644
-     force: yes
+     force: true
   tags: ['never', 'docker']
   notify: restart docker unit
 
@@ -49,7 +49,7 @@
     owner: root
     group: root
     mode: 0644
-    force: yes
+    force: true
   tags: docker
   notify: restart docker unit
 
@@ -62,7 +62,7 @@
   apt:
     name: ['apt-transport-https','ca-certificates','curl','software-properties-common']
     state: present
-    update_cache: yes
+    update_cache: true
   tags: docker
 
 - name: install docker packages
@@ -71,7 +71,7 @@
       - docker-ce
       - docker-ce-cli
     state: present
-    force: yes
+    force: true
   tags: docker
   notify: restart docker unit
 
@@ -79,8 +79,8 @@
   user:
      name: "{{ ansible_user }}"
      groups: docker
-     append: yes
-  become: yes
+     append: true
+  become: true
   register: user_info
   tags: docker
   notify: restart docker unit
@@ -114,7 +114,7 @@
      owner: "{{ user_info.name }}"
      group: "{{ user_info.group }}"
      mode: 0644
-     force: yes
+     force: true
   vars:
      docker_existing_config: "{{ docker_config.content | default('{}' | b64encode) | b64decode | from_json }}"
      docker_proxy_config: "{{ lookup('template', 'docker-config.json.j2', convert_data=False) | from_json }}"
@@ -123,10 +123,10 @@
 
 - name: Just force systemd to reread configs (2.4 and above)
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
   tags: docker
 
 - name: Just force systemd to re-execute itself (2.8 and above)
   ansible.builtin.systemd:
-    daemon_reexec: yes
+    daemon_reexec: true
   tags: docker

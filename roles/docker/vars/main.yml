@@ -4,4 +4,4 @@
 # use default_gw to set default IP gateway (default: 172.20.5.198)
 
 ---
-  gather_facts: yes
+  gather_facts: true

@@ -4,8 +4,8 @@
 
 ---
 - hosts: k8s
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   remote_user: ubuntu
   gather_facts: true
   vars:
@@ -19,8 +19,8 @@
 
 
 - hosts: infra
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   remote_user: ubuntu
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
@@ -29,8 +29,8 @@
     - security
 
 - hosts: server
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   remote_user: ubuntu
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
@@ -39,8 +39,8 @@
 
 
 - hosts: cluster
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   remote_user: ubuntu
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
@@ -54,8 +54,8 @@
 
 
 - hosts: gpucluster
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   remote_user: ubuntu
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
@@ -72,8 +72,8 @@
 
 
 - hosts: ipaserver
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   remote_user: ubuntu
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
@@ -86,8 +86,8 @@
 
 
 - hosts: ipaclients
-  become: yes
-  ignore_errors: yes
+  become: true
+  ignore_errors: true
   remote_user: ubuntu
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"

@@ -81,7 +81,7 @@
     ansible.builtin.copy:
       src: /usr/src/cudnn_samples_v8/
       dest: "{{ cudnn_build_dir.path }}/"
-      remote_src: yes
+      remote_src: true
     when: cudnn_build_dir.path is defined
 
   - name: Compile the cuDNN sample project
