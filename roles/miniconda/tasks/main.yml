@@ -11,6 +11,7 @@
     path: /opt/miniconda
     state: directory
     owner: root
+    group: root
     mode: 0755
 
 - name: run miniconda installer
@@ -27,6 +28,9 @@
     dest: "/etc/profile.d/miniconda.sh"
     content: |
       export PATH=/opt/miniconda/bin:$PATH
+    owner: root
+    group: root
+    mode: 0755
 
 # - name: add PATH and initialize
 #   shell: export PATH=/opt/miniconda/bin:$PATH && conda init

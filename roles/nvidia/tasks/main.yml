@@ -47,6 +47,7 @@
     ansible.builtin.copy:
       src: "{{ lookup('fileglob', cudnn_samples_glob) }}"
       dest: "{{ samples_package_dir.path }}/"
+      mode: 0644
     register: deb_path
     when: samples_package_dir.path is defined
 
