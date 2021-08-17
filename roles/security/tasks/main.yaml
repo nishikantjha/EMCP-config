@@ -17,9 +17,9 @@
 - name: install packages
   apt:
     pkg:
-    - htop
-    - iftop
-    - smartmontools
+      - htop
+      - iftop
+      - smartmontools
   tags: admin-tools
 
 - name: Prevent sleep and hibernation

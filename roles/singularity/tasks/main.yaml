@@ -7,7 +7,7 @@
 
 - name: Add Ansible Repo Key
   command:
-   argv:
+    argv:
     - /usr/bin/apt-key
     - adv
     - --keyserver-options
