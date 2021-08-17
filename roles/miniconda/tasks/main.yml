@@ -6,7 +6,7 @@
     mode: 0755
 
 - name: create conda folder
-  become: True
+  become: true
   file:
     path: /opt/miniconda
     state: directory
@@ -23,7 +23,7 @@
     path: /tmp/install-miniconda.sh
 
 - name: add to path
-  become: True
+  become: true
   copy:
     dest: "/etc/profile.d/miniconda.sh"
     content: |
@@ -38,7 +38,7 @@
 #     executable: /bin/bash
 
 - name: miniconda +r+x for all
-  become: True
+  become: true
   file:
     path: /opt/miniconda
     mode: 0755
