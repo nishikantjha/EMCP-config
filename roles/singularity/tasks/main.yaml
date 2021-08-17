@@ -21,6 +21,6 @@
 - name: install singularity
   apt:
     name: singularity-container
-    state: latest
+    state: present
     update_cache: true
   tags: singularity
