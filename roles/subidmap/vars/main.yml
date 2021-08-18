@@ -1,0 +1,7 @@
+# Allocate 2^16 subordinate IDs for each user as recommended by
+# https://github.com/systemd/systemd/blob/main/docs/UIDS-GIDS.md
+subid_step: 65536
+
+# Set 2^32-1 as the hard exclusive cap for ID numbers, putting the last usable
+# subid at 2^32-2.
+subid_cap: 4294967295

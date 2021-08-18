@@ -1,0 +1,26 @@
+---
+- name: Calculate suitable ID ranges for mapping users and groups to subordinate IDs
+  block:
+  - include_tasks: calculate_range.yml
+  run_once: true
+  tags: subidmap
+
+- name: Write the mapping file on the controller host
+  become: false
+  block:
+  - include_tasks: generate_mappings.yml
+  run_once: true
+  tags: subidmap
+
+- name: Copy the mapping file to the target hosts
+  ansible.builtin.copy:
+    src: "{{ sub_id_file['path'] }}"
+    dest: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: sub_id_file['path'] is defined
+  loop:
+    - /etc/subuid
+    - /etc/subgid
+  tags: subidmap
