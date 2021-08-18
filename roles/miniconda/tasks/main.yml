@@ -6,11 +6,12 @@
     mode: 0755
 
 - name: create conda folder
-  become: True
+  become: true
   file:
     path: /opt/miniconda
     state: directory
     owner: root
+    group: root
     mode: 0755
 
 - name: run miniconda installer
@@ -22,11 +23,14 @@
     path: /tmp/install-miniconda.sh
 
 - name: add to path
-  become: True
+  become: true
   copy:
     dest: "/etc/profile.d/miniconda.sh"
     content: |
       export PATH=/opt/miniconda/bin:$PATH
+    owner: root
+    group: root
+    mode: 0755
 
 # - name: add PATH and initialize
 #   shell: export PATH=/opt/miniconda/bin:$PATH && conda init
@@ -34,9 +38,8 @@
 #     executable: /bin/bash
 
 - name: miniconda +r+x for all
-  become: True
+  become: true
   file:
     path: /opt/miniconda
     mode: 0755
-    recurse: yes
-  
+    recurse: true

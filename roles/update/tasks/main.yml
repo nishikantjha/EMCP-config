@@ -8,7 +8,7 @@
   apt: upgrade=dist force_apt_get=yes
   tags: update
 
-- name: Check if a reboot is needed 
+- name: Check if a reboot is needed
   register: reboot_required_file
   stat: path=/var/run/reboot-required get_md5=no
   tags: update
@@ -23,7 +23,3 @@
     test_command: uptime
   when: reboot_required_file.stat.exists
   tags: update
-
-
-
-

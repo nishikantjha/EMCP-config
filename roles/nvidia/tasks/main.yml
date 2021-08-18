@@ -1,69 +1,70 @@
 - name: Install drivers and libraries
   block:
-  - name: Driver and cuda toolkit
-    vars:
-      nvidia_driver_ubuntu_install_from_cuda_repo: true
-      nvidia_driver_ubuntu_cuda_package: "{{ cuda_package_name }}"
-    include_role:
-      name: nvidia.nvidia_driver
+    - name: Driver and cuda toolkit
+      vars:
+        nvidia_driver_ubuntu_install_from_cuda_repo: true
+        nvidia_driver_ubuntu_cuda_package: "{{ cuda_package_name }}"
+      include_role:
+        name: nvidia.nvidia_driver
 
-  - name: Test the driver installation
-    ansible.builtin.command: /usr/bin/nvidia-smi
-    changed_when: false
+    - name: Test the driver installation
+      ansible.builtin.command: /usr/bin/nvidia-smi
+      changed_when: false
 
-  - name: Install the container runtime
-    include_role:
-      name: nvidia.nvidia_docker
+    - name: Install the container runtime
+      include_role:
+        name: nvidia.nvidia_docker
 
-  - name: Check whether Docker Engine is running
-    ansible.builtin.command: /usr/bin/systemctl is-active docker.service
-    register: docker_running
-    changed_when: false
-    failed_when: false
+    - name: Check whether Docker Engine is running
+      ansible.builtin.command: /usr/bin/systemctl is-active docker.service
+      register: docker_running
+      changed_when: false
+      failed_when: false
 
-  - name: Test the container runtime
-    ansible.builtin.command: "/usr/bin/docker run --rm --gpus=all {{ cuda_nvidia_image }} nvidia-smi"
-    changed_when: false
-    when: docker_running is succeeded
+    - name: Test the container runtime
+      ansible.builtin.command: "/usr/bin/docker run --rm --gpus=all {{ cuda_nvidia_image }} nvidia-smi"
+      changed_when: false
+      when: docker_running is succeeded
 
-  - name: Install cuDNN
-    ansible.builtin.apt:
-      name:
-        - "{{ cudnn_package_spec }}"
-        - "{{ cudnn_dev_package_spec }}"
-      state: present
+    - name: Install cuDNN
+      ansible.builtin.apt:
+        name:
+          - "{{ cudnn_package_spec }}"
+          - "{{ cudnn_dev_package_spec }}"
+        state: present
   tags: nvidia-install
 
 # Downloading the libcudnn samples requires an NVIDIA Developer Program Membership.
 - name: Install libcudnn samples
   block:
-  - name: Create a temp directory
-    ansible.builtin.tempfile:
-      suffix: cudnnsamplespackage
-      state: directory
-    register: samples_package_dir
+    - name: Create a temp directory
+      ansible.builtin.tempfile:
+        suffix: cudnnsamplespackage
+        state: directory
+      register: samples_package_dir
 
-  - name: Copy the package
-    ansible.builtin.copy:
-      src: "{{ lookup('fileglob', cudnn_samples_glob) }}"
-      dest: "{{ samples_package_dir.path }}/"
-    register: deb_path
-    when: samples_package_dir.path is defined
+    - name: Copy the package
+      ansible.builtin.copy:
+        src: "{{ lookup('fileglob', cudnn_samples_glob) }}"
+        dest: "{{ samples_package_dir.path }}/"
+        mode: 0644
+      register: deb_path
+      when: samples_package_dir.path is defined
 
-  - name: Install the samples package
-    ansible.builtin.apt:
-      deb: "{{ deb_path.dest }}"
-    when: deb_path.dest is defined
+    - name: Install the samples package
+      ansible.builtin.apt:
+        deb: "{{ deb_path.dest }}"
+      when: deb_path.dest is defined
 
-  - name: Remove the temp directory
-    ansible.builtin.file:
-      path: "{{ samples_package_dir.path }}"
-      state: absent
-    when: samples_package_dir.path is defined
+    - name: Remove the temp directory
+      ansible.builtin.file:
+        path: "{{ samples_package_dir.path }}"
+        state: absent
+      when: samples_package_dir.path is defined
 
-  - name: Install the libfreeimage-dev dependency
-    ansible.builtin.apt:
-      name: libfreeimage-dev
+    - name: Install the libfreeimage-dev dependency
+      ansible.builtin.apt:
+        name: libfreeimage-dev
   tags: nvidia-cudnn-verify
 
 # Verification step as described at
@@ -71,36 +72,37 @@
 - name: Verify the cuDNN installation
   become: false
   block:
-  - name: Create a temp directory
-    ansible.builtin.tempfile:
-      suffix: cudnnsamplebuild
-      state: directory
-    register: cudnn_build_dir
+    - name: Create a temp directory
+      ansible.builtin.tempfile:
+        suffix: cudnnsamplebuild
+        state: directory
+      register: cudnn_build_dir
 
-  - name: Copy the cuDNN sample project
-    ansible.builtin.copy:
-      src: /usr/src/cudnn_samples_v8/
-      dest: "{{ cudnn_build_dir.path }}/"
-      remote_src: yes
-    when: cudnn_build_dir.path is defined
+    - name: Copy the cuDNN sample project
+      ansible.builtin.copy:
+        src: /usr/src/cudnn_samples_v8/
+        dest: "{{ cudnn_build_dir.path }}/"
+        remote_src: true
+        directory_mode: 0755
+      when: cudnn_build_dir.path is defined
 
-  - name: Compile the cuDNN sample project
-    ansible.builtin.command:
-      cmd: /usr/bin/make
-      chdir: "{{ cudnn_build_dir.path }}/mnistCUDNN"
-    changed_when: false
-    when: cudnn_build_dir.path is defined
+    - name: Compile the cuDNN sample project
+      ansible.builtin.command:
+        cmd: /usr/bin/make
+        chdir: "{{ cudnn_build_dir.path }}/mnistCUDNN"
+      changed_when: false
+      when: cudnn_build_dir.path is defined
 
-  - name: Run the compiled executable
-    ansible.builtin.command:
-      cmd: ./mnistCUDNN
-      chdir: "{{ cudnn_build_dir.path }}/mnistCUDNN"
-    changed_when: false
-    when: cudnn_build_dir.path is defined
+    - name: Run the compiled executable
+      ansible.builtin.command:
+        cmd: ./mnistCUDNN
+        chdir: "{{ cudnn_build_dir.path }}/mnistCUDNN"
+      changed_when: false
+      when: cudnn_build_dir.path is defined
 
-  - name: Remove the temp directory
-    ansible.builtin.file:
-      path: "{{ cudnn_build_dir.path }}"
-      state: absent
-    when: cudnn_build_dir.path is defined
+    - name: Remove the temp directory
+      ansible.builtin.file:
+        path: "{{ cudnn_build_dir.path }}"
+        state: absent
+      when: cudnn_build_dir.path is defined
   tags: nvidia-cudnn-verify
