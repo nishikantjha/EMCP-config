@@ -100,3 +100,41 @@
       state: present
       tags: freeIPA-client
     - users
+
+
+- hosts: tio
+  become: true
+  ignore_errors: true
+  remote_user: ubuntu
+  gather_facts: true
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - update
+    - security
+    - tio-users
+    - tio-devtools
+    - seafile
+
+
+- hosts: tionfsserver
+  become: true
+  ignore_errors: true
+  remote_user: ubuntu
+  gather_facts: true
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - update
+    - security
+    - tio-nfsexport
+
+
+- hosts: tionfsclients
+  become: true
+  ignore_errors: true
+  remote_user: ubuntu
+  gather_facts: true
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - update
+    - security
+    - tio-nfsmount

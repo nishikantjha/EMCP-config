@@ -1,0 +1,92 @@
+---
+- name: Create root user docker config directory
+  file:
+    path: /root/.docker
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: Create systemd docker config directory
+  file:
+    path: /etc/systemd/system/docker.service.d
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: Docker container proxy config -- Configure proxy services for docker containers
+  template:
+    src: "docker-config.json.j2"
+    dest: "/root/.docker/config.json"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+
+- name: Docker proxy config -- Configure proxy services for dockerd
+  template:
+    src: "systemd-http-proxy.conf.j2"
+    dest: "/etc/systemd/system/docker.service.d/http-proxy.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+  notify: restart docker unit
+
+- name: Obtain information about the docker group
+  getent:
+    database: group
+    split: ':'
+    key: docker
+    fail_key: false
+
+- name: Create a list containing the members of the docker group
+  set_fact:
+    docker_users: "{{ getent_group['docker'][2] | split(',') }}"
+  when: getent_group['docker'][2] is defined
+
+- name: Create configuration directories for users in the docker group
+  file:
+    path: "/home/{{ item }}/.docker"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0755
+    state: directory
+  loop: "{{ docker_users | default([]) }}"
+
+- name: For each docker user, create a configuration file or preserve the current one if it already exists
+  file:
+    path: "/home/{{ item }}/.docker/config.json"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0644
+    state: touch
+  loop: "{{ docker_users | default([]) }}"
+  register: docker_config_files
+
+- name: Read the configuration files
+  slurp:
+    src: "{{ item['dest'] }}"
+  loop: "{{ docker_config_files['results'] | default([]) }}"
+  register: docker_config_contents
+
+- name: Convert the contents of the configuration files into dictionaries
+  vars:
+    empty_json: "{{ '{}' | b64encode }}"
+  set_fact:
+    docker_user_config: "{{ (item['content'] is defined and item['content'] != '') | ternary(item['content'], empty_json) | b64decode | from_json }}"
+  loop: "{{ docker_config_contents['results'] | default([]) }}"
+  register: docker_config_decoded
+
+- name: Add proxy settings for Docker containers
+  vars:
+    docker_proxy_config: "{{ lookup('template', 'docker-config.json.j2', convert_data=False) | from_json }}"
+  copy:
+    content: "{{ item['ansible_facts']['docker_user_config'] | combine(docker_proxy_config, recursive=True) | to_nice_json(ensure_ascii=False) }}"
+    dest: "{{ docker_config_files['results'][i]['dest'] }}"
+    mode: 0644
+    force: true
+  loop: "{{ docker_config_decoded['results'] | default([]) }}"
+  loop_control:
+    index_var: i

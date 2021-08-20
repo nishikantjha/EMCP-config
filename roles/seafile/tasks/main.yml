@@ -1,0 +1,22 @@
+---
+- name: Add the signing key
+  ansible.builtin.apt_key:
+    url: https://linux-clients.seafile.com/seafile.asc
+    state: present
+  tags:
+    - seafile
+
+- name: Add the repository
+  ansible.builtin.apt_repository:
+    repo: deb https://linux-clients.seafile.com/seafile-deb/{{ ansible_distribution_release }}/ stable main
+    state: present
+  tags:
+    - seafile
+
+- name: Install the command-line client
+  ansible.builtin.apt:
+    name: seafile-cli
+    update_cache: true
+    state: present
+  tags:
+    - seafile

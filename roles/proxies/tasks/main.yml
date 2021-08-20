@@ -1,10 +1,21 @@
 ---
-- name: IKIM Proxies
+- name: Set up proxy variables in Bash
   ansible.builtin.template:
-    src: http-proxy-profile.sh.j2
-    dest: /etc/profile.d/proxy.sh
+    src: "{{ proxy_env_filename }}.j2"
+    dest: "/etc/profile.d/{{ proxy_env_filename }}"
     owner: root
     group: root
     mode: 0755
+  tags:
+    - proxy
+
+- name: Set up proxy variables in zsh
+  ansible.builtin.blockinfile:
+    path: /etc/zsh/zprofile
+    block: "{{ lookup('template', 'zprofile.j2') }}"
+    owner: root
+    group: root
+    create: false
+    state: present
   tags:
     - proxy
