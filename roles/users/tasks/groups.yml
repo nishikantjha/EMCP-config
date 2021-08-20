@@ -1,0 +1,12 @@
+---
+- name: Create groups and assign membership as defined in the ipagroups dictionary
+  community.general.ipa_group:
+    cn: "{{ item['cn'] }}"
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    description: "{{ item['description'] | default(omit) }}"
+    gidnumber: "{{ item['gidnumber'] | default(omit) }}"
+    user: "{{ item['user'] | default(omit) }}"
+    validate_certs: false
+    state: present
+  loop: "{{ ipagroups }}"

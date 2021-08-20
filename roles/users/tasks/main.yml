@@ -1,16 +1,21 @@
 ---
 - name: Create users
-  community.general.ipa_user:
-    ipa_host: "{{ primary_ipaserver }}"
-    ipa_pass: "{{ ipaadmin_password }}"
-    name: "{{ item['name'] }}"
-    givenname: "{{ item['givenname'] | default('-') }}"
-    sn: "{{ item['sn'] | default('-') }}"
-    mail: "{{ item['email'] | default(omit) }}"
-    loginshell: "{{ item['loginshell'] | default(default_shell) }}"
-    sshpubkey: "{{ item['sshpubkey'] | default(omit) }}"
-    validate_certs: false
-    state: present
-  loop: "{{ ipausers }}"
+  block:
+    - include_tasks: users.yml
   run_once: true
-  tags: ipausers
+  tags:
+    - ipausers
+
+- name: Create groups
+  block:
+    - include_tasks: groups.yml
+  run_once: true
+  tags:
+    - ipagroups
+
+- name: Define policies
+  block:
+    - include_tasks: policies.yml
+  run_once: true
+  tags:
+    - ipapolicies

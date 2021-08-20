@@ -1,0 +1,15 @@
+---
+- name: Allow members of the group "admins" to be sudoers without a password
+  community.general.ipa_sudorule:
+    name: sudo_admins_nopasswd
+    description: Allow members of the group "admins" to execute any command on any host without a password
+    cmdcategory: all
+    hostcategory: all
+    usergroup:
+      - admins
+    sudoopt:
+      - "!authenticate"
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    validate_certs: no
+    state: enabled

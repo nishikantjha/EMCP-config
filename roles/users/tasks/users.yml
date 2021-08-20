@@ -1,0 +1,14 @@
+---
+- name: Create the users listed in the ipausers dictionary
+  community.general.ipa_user:
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    name: "{{ item['name'] }}"
+    givenname: "{{ item['givenname'] | default('-') }}"
+    sn: "{{ item['sn'] | default('-') }}"
+    mail: "{{ item['email'] | default(omit) }}"
+    loginshell: "{{ item['loginshell'] | default(default_shell) }}"
+    sshpubkey: "{{ item['sshpubkey'] | default(omit) }}"
+    validate_certs: no
+    state: present
+  loop: "{{ ipausers }}"
