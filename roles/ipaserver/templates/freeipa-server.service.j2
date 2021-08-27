@@ -6,10 +6,10 @@ Requires=docker.service
 [Service]
 TimeoutStartSec=1hour
 Restart=always
-ExecStartPre=-/usr/bin/docker stop {{ server_container_name }}
-ExecStartPre=-/usr/bin/docker rm {{ server_container_name }}
+ExecStartPre=-/usr/bin/docker stop {{ ipa_server_container_name }}
+ExecStartPre=-/usr/bin/docker rm {{ ipa_server_container_name }}
 ExecStartPre=/usr/bin/docker pull {{ ipa_server_image }}
-ExecStart=/usr/bin/docker run -t --name {{ server_container_name }} \
+ExecStart=/usr/bin/docker run -t --name {{ ipa_server_container_name }} \
 	--read-only \
 	-v "{{ ipa_storage }}:/data" \
 	-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
