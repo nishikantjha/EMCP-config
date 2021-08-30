@@ -1,3 +1,10 @@
+---
+
+- name: check for krb5 package needed for kinit
+  ansible.builtin.apt:
+    name: krb5-user
+    state: present
+
 - name: Obtain a ticket using the default keytab on the current client
   ansible.builtin.command: kinit -k
 
