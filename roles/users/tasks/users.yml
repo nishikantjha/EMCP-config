@@ -9,6 +9,6 @@
     mail: "{{ item['email'] | default(omit) }}"
     loginshell: "{{ item['loginshell'] | default(default_shell) }}"
     sshpubkey: "{{ item['sshpubkey'] | default(omit) }}"
-    validate_certs: no
+    validate_certs: false
     state: present
   loop: "{{ ipausers }}"

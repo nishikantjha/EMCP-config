@@ -10,6 +10,8 @@
   block:
   - include_tasks: generate_mappings.yml
   run_once: true
+  delegate_to: "127.0.0.1"
+  notify: remove local temp file
   tags: subidmap
 
 - name: Copy the mapping file to the target hosts
