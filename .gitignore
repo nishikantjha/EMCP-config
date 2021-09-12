@@ -1,6 +1,9 @@
 # Ansible Vault password file
 vault-pass
 
+# DGX OS image file
+roles/dgx-image-maas/files/DGXOS-*.iso
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

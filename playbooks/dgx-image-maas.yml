@@ -1,0 +1,7 @@
+---
+- hosts: origin
+  become: true
+  remote_user: ubuntu
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - dgx-image-maas
