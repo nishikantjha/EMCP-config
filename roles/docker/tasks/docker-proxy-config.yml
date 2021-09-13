@@ -32,4 +32,11 @@
     group: root
     mode: 0644
     force: true
-  notify: restart docker unit
+  register: docker_proxy_conf
+
+- name: Reload the systemd configuration and restart the Docker unit
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+    daemon_reload: true
+  when: docker_proxy_conf is changed
