@@ -1,0 +1,14 @@
+- name: Install the container runtime
+  include_role:
+    name: nvidia.nvidia_docker
+
+- name: Check whether Docker Engine is running
+  ansible.builtin.command: /usr/bin/systemctl is-active docker.service
+  register: docker_running
+  changed_when: false
+  failed_when: false
+
+- name: Test the container runtime
+  ansible.builtin.command: "/usr/bin/docker run --rm --gpus=all {{ cuda_nvidia_image }} nvidia-smi"
+  changed_when: false
+  when: docker_running is succeeded

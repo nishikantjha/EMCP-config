@@ -1,47 +1,9 @@
 - name: Install drivers and libraries
   block:
-    - name: Install gpu drivers and the cuda toolkit
-      vars:
-        nvidia_driver_ubuntu_install_from_cuda_repo: true
-        nvidia_driver_ubuntu_cuda_package: "{{ cuda_package_name }}"
-      include_role:
-        name: nvidia.nvidia_driver
+  - include_tasks: nvidia-driver-libs.yml
+  tags: nvidia
 
-    - name: Add the cuda compiler to PATH
-      ansible.builtin.copy:
-        src: cuda_env.sh
-        dest: /etc/profile.d/cuda_env.sh
-        owner: root
-        group: root
-        mode: 0644
-
-    - name: Test the driver installation
-      ansible.builtin.command: /usr/bin/nvidia-smi
-      changed_when: false
-
-    - name: Test the cuda installation
-      ansible.builtin.command: /usr/local/cuda/bin/nvcc -V
-      changed_when: false
-
-    - name: Install the container runtime
-      include_role:
-        name: nvidia.nvidia_docker
-
-    - name: Check whether Docker Engine is running
-      ansible.builtin.command: /usr/bin/systemctl is-active docker.service
-      register: docker_running
-      changed_when: false
-      failed_when: false
-
-    - name: Test the container runtime
-      ansible.builtin.command: "/usr/bin/docker run --rm --gpus=all {{ cuda_nvidia_image }} nvidia-smi"
-      changed_when: false
-      when: docker_running is succeeded
-
-    - name: Install cuDNN
-      ansible.builtin.apt:
-        name:
-          - "{{ cudnn_package_spec }}"
-          - "{{ cudnn_dev_package_spec }}"
-        state: present
+- name: Install the Docker runtime
+  block:
+  - include_tasks: nvidia-docker.yml
   tags: nvidia
