@@ -61,14 +61,14 @@
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - update
-    - nfs-client
-    - g-nodes
-    - docker
     - security
-    - nvidia
+    - g-nodes
+    - nfs-client
     - proxies
-    - miniconda
     - ssh-config
+    - docker
+    - nvidia
+    - miniconda
 
 
 - hosts: ipaserver
