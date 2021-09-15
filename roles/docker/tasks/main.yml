@@ -1,10 +1,10 @@
 ---
 - name: Install Docker Engine
   block:
-  - include_tasks: docker-install.yml
+    - include_tasks: docker-install.yml
   tags: docker
 
 - name: Make Docker aware of the http proxy
   block:
-  - include_tasks: docker-proxy-config.yml
+    - include_tasks: docker-proxy-config.yml
   tags: docker-proxy
