@@ -86,7 +86,6 @@
 
 - hosts: ipaclients
   become: true
-  ignore_errors: true
   remote_user: ubuntu
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
