@@ -47,7 +47,6 @@
   roles:
     - update
     - c-nodes
-    - nfs-client
     - singularity
     - security
     - ssh-config
@@ -63,7 +62,6 @@
     - update
     - security
     - g-nodes
-    - nfs-client
     - proxies
     - ssh-config
     - docker
@@ -83,6 +81,7 @@
     - proxies
     - docker
     - ipaserver
+    - ipaserver-settings
 
 
 - hosts: ipaclients
@@ -92,13 +91,22 @@
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
   roles:
-    - update
-    - security
-    - proxies
-    - subidmap
     - role: freeipa.ansible_freeipa.ipaclient
       state: present
       tags: freeIPA-client
+
+
+- hosts: managed_cluster
+  become: true
+  ignore_errors: true
+  remote_user: ubuntu
+  gather_facts: true
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - update
+    - security
+    - subidmap
+    - nfs-client
     - users
 
 
