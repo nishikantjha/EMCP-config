@@ -1,16 +1,23 @@
 ---
 
 - name: Update apt repo and cache on all Ubuntu machines
-  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+  apt:
+    update_cache: true
+    force_apt_get: true
+    cache_valid_time: 3600
   tags: update
 
 - name: Upgrade all apt packages
-  apt: upgrade=dist force_apt_get=yes
+  apt:
+    upgrade: dist
+    force_apt_get: true
   tags: update
 
 - name: Check if a reboot is needed
   register: reboot_required_file
-  stat: path=/var/run/reboot-required get_md5=no
+  stat:
+    path: /var/run/reboot-required
+    get_md5: false
   tags: update
 
 - name: Reboot the Debian or Ubuntu server

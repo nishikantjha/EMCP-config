@@ -1,0 +1,24 @@
+# per https://github.com/conda-forge/miniforge
+# setup mambaforge
+
+- name: Download mambaforge installer
+  ansible.builtin.get_url:
+    url: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
+    dest: /tmp/mambaforge.sh
+
+- name: Install mambaforge into /opt/mambaforge
+  shell: bash /tmp/mambaforge.sh -b -p /opt/mambaforge
+
+- name: Set permissions
+  file:
+    path: /opt/mambaforge
+    owner: root
+#    group: # TODO is there already a group for all people who should be allowed to deploy packages and environments?
+    mode: g+s   # inherit group when creating files
+    state: directory
+    recurse: true
+
+- name: Remove mambaforge installer
+  file:
+    path: /tmp/mambaforge.sh
+    state: absent

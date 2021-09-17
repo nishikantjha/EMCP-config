@@ -2,7 +2,7 @@
 # setup singularity
 
 - name: Add Ansible Repo for neuro debian
-  ansible.builtin.shell: wget -O- http://neuro.debian.net/lists/focal.de-m.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+  ansible.builtin.shell: set -o pipefail && wget -O- http://neuro.debian.net/lists/focal.de-m.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
   tags: singularity
 
 - name: Add Ansible Repo Key

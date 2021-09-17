@@ -30,8 +30,8 @@ jobs:
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Only lint ansible. See
-          # https://github.com/github/super-linter#supported-linters
-          # for other supported linters
           VALIDATE_ANSIBLE: true
-          ANSIBLE_DIRECTORY: .
+          ANSIBLE_DIRECTORY: ansible
+          ANSIBLE_CONFIG_FILE: .ansible-lint.yml
+          IGNORE_GITIGNORED_FILES: true
+          FILTER_REGEX_EXCLUDE: ".*/files/.*"

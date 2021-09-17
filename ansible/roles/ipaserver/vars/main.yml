@@ -1,0 +1,19 @@
+server_options_filename: ipa-server-install-options
+server_options_path: "{{ ipa_storage }}/{{ server_options_filename }}"
+server_service_name: freeipa-server
+server_container_name: "{{ server_service_name }}-container"
+
+ipa_server_ports:
+  # HTTP/HTTPS
+  - "80/tcp"
+  - "443/tcp"
+  # LDAP/LDAPS
+  - "389/tcp"
+  - "636/tcp"
+  # Kerberos
+  - "88/tcp"
+  - "88/udp"
+  - "464/tcp"
+  - "464/udp"
+
+resolvectl_regex: "Link.+\\((.+)\\): yes"
