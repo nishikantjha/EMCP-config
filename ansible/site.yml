@@ -50,6 +50,7 @@
     - singularity
     - security
     - ssh-config
+    - proxies
 
 
 - hosts: gpucluster
