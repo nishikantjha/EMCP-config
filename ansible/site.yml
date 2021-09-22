@@ -104,6 +104,10 @@
     - c-nodes
     - security
 
+- hosts: nfs_servers
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - docker-user-config
 
 - hosts: tio
   become: true
