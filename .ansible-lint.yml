@@ -7,15 +7,16 @@ exclude_paths:
 # verbosity: 1
 
 # Mock modules or roles in order to pass ansible-playbook --syntax-check
-mock_modules:
-  - zuul_return
+# mock_modules:
+#   - zuul_return
   # note the foo.bar is invalid as being neither a module or a collection
-  - fake_namespace.fake_collection.fake_module
-  - fake_namespace.fake_collection.fake_module.fake_submodule
+  # - fake_namespace.fake_collection.fake_module
+  # - fake_namespace.fake_collection.fake_module.fake_submodule
 mock_roles:
-  - mocked_role
-  - author.role_name  # old standalone galaxy role
-  - fake_namespace.fake_collection.fake_role  # role within a collection
+  - freeipa.ansible_freeipa.ipaclient  # necessary because ansible lint cannot evaluate the requirements.yml file
+#   - mocked_role
+#   - author.role_name  # old standalone galaxy role
+#   - fake_namespace.fake_collection.fake_role  # role within a collection
 
 # Enable checking of loop variable prefixes in roles
 loop_var_prefix: "{role}_"
@@ -31,9 +32,7 @@ use_default_rules: true
 #   - ./rule/directory/
 
 # This makes linter to fully ignore rules/tags listed below
-skip_list:
-  - skip_this_tag
-  - git-latest
+# skip_list:
 
 # Any rule that has the 'opt-in' tag will not be loaded unless its 'id' is
 # mentioned in the enable_list:
@@ -58,14 +57,6 @@ warn_list:
 # Offline mode disables installation of requirements.yml
 offline: false
 
-# Define required Ansible's variables to satisfy syntax check
-extra_vars:
-  foo: bar
-  multiline_string_variable: |
-    line1
-    line2
-  complex_variable: ":{;\t$()"
-
 # Uncomment to enforce action validation with tasks, usually is not
 # needed as Ansible syntax check also covers it.
 # skip_action_validation: false
@@ -77,8 +68,8 @@ kinds:
   - playbook: "**/playbooks/*.{yml,yaml}"
   - playbook: "**/site.yml"
   # - galaxy: "**/folder/galaxy.yml"
-  # - tasks: "**/tasks/*.yml"
-  # - vars: "**/vars/*.yml"
-  # - meta: "**/meta/*.yml"
-  # - inventory: "**/inventories/*.yml"
+  - tasks: "**/tasks/*.yml"
+  - vars: "**/vars/*.yml"
+  - meta: "**/meta/*.yml"
+  - inventory: "**/inventory/*.yml"
   - yaml: "**/*.{yml,yaml}"

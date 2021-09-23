@@ -1,10 +1,5 @@
 name: Lint Code Base
 
-#
-# Documentation:
-# https://help.github.com/en/articles/workflow-syntax-for-github-actions
-#
-
 on:
   push:
     branches:
@@ -22,16 +17,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
-          # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
-      - name: Lint Code Base
-        uses: github/super-linter@v4
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ANSIBLE: true
-          ANSIBLE_DIRECTORY: ansible
-          ANSIBLE_CONFIG_FILE: .ansible-lint.yml
-          IGNORE_GITIGNORED_FILES: true
-          FILTER_REGEX_EXCLUDE: ".*/files/.*"
+      - name: Lint ansible project
+        uses: hfrSchmidt/ansible-lint-github-action@v0.2.3
+        with:
+          project_dir: 'ansible'
+          config_file: '.ansible-lint.yml'
+          args: '--parseable-severity --force-color -v'
+

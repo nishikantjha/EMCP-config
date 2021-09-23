@@ -1,8 +1,6 @@
-#!/usr/bin/env ansible-playbook
+---
 
 # setup rancher on k01-20
-
----
 - hosts: k8s
   become: true
   ignore_errors: true
