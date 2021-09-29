@@ -1,0 +1,61 @@
+---
+
+- name: install dependencies
+  ansible.builtin.apt:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Check whether the automountmap already exists
+  community.docker.docker_container_exec:
+    container: "{{ ipa_server_container_name }}"
+    argv:
+      - ipa
+      - automountmap-find
+      - default
+      - "auto.{{ mapname }}"
+    tty: true
+  become: true
+  changed_when: false
+  register: automountmap_search
+
+
+- name: Create the automount map
+  community.docker.docker_container_exec:
+    container: "{{ ipa_server_container_name }}"
+    argv:
+      - ipa
+      - automountmap-add
+      - default
+      - "auto.{{ mapname }}"
+    tty: true
+  become: true
+  when: automountmap_search.stdout is search("0 automount maps matched")
+
+- name: Add the automountmap to auto.master
+  community.docker.docker_container_exec:
+    container: "{{ ipa_server_container_name }}"
+    argv:
+      - ipa
+      - automountkey-add
+      - default
+      - "--key \"/{{ mapname }}\""
+      - "--info auto.{{ mapname }}"
+      - "auto.master"
+    tty: true
+  become: true
+  when: automountmap_search.stdout is search("0 automount maps matched")
+
+- name: Add the automountkey
+  community.docker.docker_container_exec:
+    container: "{{ ipa_server_container_name }}"
+    argv:
+      - ipa
+      - automountkey-add
+      - default
+      - "--key \"*\""
+      - "--info \"-fstype=nfs4,rw s1:/dpool/share/{{ mapname }}/&\""
+      - "auto.{{ mapname }}"
+    tty: true
+  become: true
+  when: automountmap_search.stdout is search("0 automount maps matched")

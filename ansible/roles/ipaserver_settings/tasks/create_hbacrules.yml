@@ -1,0 +1,45 @@
+---
+
+- name: ensure all hosts can be accessed by admins
+  community.general.ipa_hbacrule:
+    name: allow_admins_all
+    description: Allow admins access to any host from any host
+    hostcategory: all
+    servicecategory: all
+    usergroup: admins
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    validate_certs: false
+    state: present
+  become: true
+
+- name: ensure cluster hosts can be accessed by normal users via ssh
+  community.general.ipa_hbacrule:
+    name: allow_users_cluster
+    description: Allow regular users to access the cluster hosts via ssh
+    hostgroup: regular_cluster_servers
+    service: sshd
+    usergroup: ipausers
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    validate_certs: false
+    state: present
+  become: true
+
+- name: ensure allow_all rule is disabled
+  community.general.ipa_hbacrule:
+    name: allow_all
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    validate_certs: false
+    state: disabled
+  become: true
+
+- name: ensure allow_systemd-user rule is disabled
+  community.general.ipa_hbacrule:
+    name: allow_systemd-user
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    validate_certs: false
+    state: disabled
+  become: true

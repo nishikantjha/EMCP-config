@@ -7,6 +7,7 @@
 
 - name: Obtain a ticket using the default keytab on the current client
   ansible.builtin.command: kinit -k
+  changed_when: false   # FIXME the role needs to be reworked for idempotency
 
 - name: Query the server
   ansible.builtin.command: ipa idrange-find
@@ -37,7 +38,7 @@
 # subordinate IDs.
 - name: Find a suitable value for the first subordinate ID
   ansible.builtin.set_fact:
-    subid_start: "{{ item }}"
+    subid_start: "{{ subidmap_item }}"
   when:
     - last_ipa_id is defined
     - item > last_ipa_id|int
@@ -47,6 +48,8 @@
     - 536870912
     - 268435456
     - 134217728
+  loop_control:
+    loop_var: subidmap_item
 
 # As the last preallocated subordinate ID, pick a value which covers a number
 # of users defined by mappable_users_cap.

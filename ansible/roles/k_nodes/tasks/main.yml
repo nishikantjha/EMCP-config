@@ -1,0 +1,89 @@
+---
+
+- name: partition the 2nd drive
+  community.general.parted:
+    device: /dev/sdb
+    number: 1
+    state: present
+  become: true
+  tags:
+    - mount_local
+
+- name: format the drive
+  filesystem:
+    fstype: ext4
+    dev: /dev/sdb1
+  become: true
+
+- name: create /local directory
+  ansible.builtin.file:
+    path: /local
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+  tags:
+    - mount_local
+
+- name: mount /local/sdb
+  mount:
+    path: /local
+    src: /dev/sdb1
+    fstype: ext4
+    state: mounted
+  become: true
+  tags:
+    - mount_local
+
+##########
+- name: partition the 3rd drive
+  community.general.parted:
+    device: /dev/sdc
+    number: 1
+    state: present
+  become: true
+  tags:
+    - mount_local
+
+- name: format the drive
+  filesystem:
+    fstype: ext4
+    dev: /dev/sdc1
+  become: true
+
+- name: mount /local/sdc
+  mount:
+    path: /local
+    src: /dev/sdc1
+    fstype: ext4
+    state: mounted
+  become: true
+  tags:
+    - mount_local
+
+##########
+- name: partition the 4th drive
+  community.general.parted:
+    device: /dev/sdd
+    number: 1
+    state: present
+  become: true
+  tags:
+    - mount_local
+
+- name: format the drive
+  filesystem:
+    fstype: ext4
+    dev: /dev/sdd1
+  become: true
+
+- name: mount /local/sdc
+  mount:
+    path: /local
+    src: /dev/sdd1
+    fstype: ext4
+    state: mounted
+  become: true
+  tags:
+    - mount_local

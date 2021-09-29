@@ -1,0 +1,11 @@
+---
+
+# ensure that the home directory path is set to /homes for all users
+# reason: the shared home directory from s1 is mounted at /homes
+- name: create nfs service on ipa server
+  community.general.ipa_config:
+    ipahomesrootdir: /homes
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    validate_certs: false
+  become: true

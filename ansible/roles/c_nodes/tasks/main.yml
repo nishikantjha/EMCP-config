@@ -1,0 +1,74 @@
+---
+
+- name: partition the 2nd drive
+  parted:
+    device: /dev/sdb
+    number: 1
+    state: present
+  become: true
+  tags:
+    - mount_local
+    - skip_ansible_lint
+
+- name: format the drive
+  filesystem:
+    fstype: ext4
+    dev: /dev/sdb1
+  become: true
+
+- name: create /local directory
+  ansible.builtin.file:
+    path: /local
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+  tags:
+    - mount_local
+
+- name: mount /local
+  mount:
+    path: /local
+    src: /dev/sdb1
+    fstype: ext4
+    opts: acl,user_xattr
+    state: mounted
+  become: true
+  tags:
+    - mount_local
+
+
+- name: create /local/work directory
+  ansible.builtin.file:
+    path: /local/work
+    state: directory
+    owner: root
+    group: root
+    mode: 0777
+  become: true
+  tags:
+    - mount_local
+
+- name: create /local/cache directory
+  ansible.builtin.file:
+    path: /local/cache
+    state: directory
+    owner: root
+    group: root
+    mode: 0770
+  become: true
+  tags:
+    - mount_local
+
+
+- name: create /local/cache directory
+  ansible.builtin.file:
+    path: /local/cache/fscache
+    state: directory
+    owner: root
+    group: root
+    mode: 0770
+  become: true
+  tags:
+    - mount_local

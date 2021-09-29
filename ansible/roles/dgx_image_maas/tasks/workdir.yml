@@ -1,0 +1,32 @@
+---
+- name: Create a directory for the packer-maas working copy
+  ansible.builtin.file:
+    path: "{{ packer_maas_working_copy }}"
+    state: directory
+    mode: 0755
+
+- name: git clone the Nvidia packer-maas repository
+  ansible.builtin.git:
+    repo: https://github.com/DeepOps/packer-maas.git
+    dest: "{{ packer_maas_working_copy }}"
+    version: "{{ packer_maas_repo_snapshot }}"
+
+- name: Download the Packer executable
+  ansible.builtin.unarchive:
+    src: "https://releases.hashicorp.com/packer/{{ packer_version }}/packer_{{ packer_version }}_linux_{{ packer_arch }}.zip"
+    dest: "{{ packer_workdir }}"
+    mode: 0755
+    remote_src: true
+
+- name: Copy the DGX OS ISO to the remote host
+  ansible.builtin.copy:
+    src: "{{ lookup('fileglob', 'DGXOS-*.iso') }}"
+    dest: "{{ packer_workdir }}/"
+    mode: 0644
+    force: false
+  register: iso_copy
+
+- name: Save the DGX OS ISO path
+  ansible.builtin.set_fact:
+    dgxos_iso: "{{ (packer_workdir, iso_copy['src'] | basename) | path_join }}"
+  when: iso_copy['src'] is defined

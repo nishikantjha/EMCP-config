@@ -1,0 +1,11 @@
+---
+
+- name: ensure regular cluster hostgroup is present
+  community.general.ipa_hostgroup:
+    name: regular_cluster_servers
+    host: "{{ groups['managed_cluster'] }}"
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    validate_certs: false
+    state: present
+  become: true

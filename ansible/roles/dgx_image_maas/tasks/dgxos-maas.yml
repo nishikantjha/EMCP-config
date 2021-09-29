@@ -1,0 +1,48 @@
+---
+- name: Clean up any existing output
+  ansible.builtin.file:
+    path: "{{ (packer_workdir, 'output-qemu') | path_join }}"
+    state: absent
+
+- name: Obtain the sha256 checksum of the DGX OS ISO
+  ansible.builtin.command:
+    argv:
+      - sha256sum
+      - "{{ dgxos_iso }}"
+  register: iso_sha256
+  when: dgxos_iso is defined
+
+- name: Create the MAAS image (max 1 hour, poll every 10 seconds)
+  ansible.builtin.command:
+    argv:
+      - ./packer
+      - build
+      - -var
+      - "dgxos5_iso={{ dgxos_iso }}"
+      - -var
+      - "dgxos5_sha256sum={{ iso_sha256['stdout'] | split(' ') | first }}"
+      - dgxos5.json
+    chdir: "{{ packer_workdir }}"
+  when:
+    - dgxos_iso is defined
+    - iso_sha256['stdout'] is defined
+  async: 3600
+  poll: 10
+  register: ret_packer_build
+
+- name: Upload to MAAS (max 1 hour, poll every 10 seconds)
+  ansible.builtin.command:
+    argv:
+      - maas
+      - "{{ maas_admin }}"
+      - boot-resources
+      - create
+      - name=custom/dgxa100-os-5
+      - title=NVIDIA DGX-A100 OS 5
+      - "architecture={{ packer_arch }}/generic"
+      - filetype=tgz
+      - content@=dgxos5.tar.gz
+    chdir: "{{ packer_workdir }}"
+  when: ret_packer_build.rc == 0
+  async: 3600
+  poll: 10

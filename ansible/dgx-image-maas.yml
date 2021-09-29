@@ -4,4 +4,4 @@
   remote_user: ubuntu
   environment: "{{ proxy_env | default({}) }}"
   roles:
-    - dgx-image-maas
+    - dgx_image_maas

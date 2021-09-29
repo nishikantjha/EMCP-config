@@ -44,9 +44,9 @@
   roles:
     - update
     - security
-    - g-nodes
+    - g_nodes
     - proxies
-    - ssh-config
+    - ssh_config
     - docker
     - nvidia
     - miniconda
@@ -63,7 +63,7 @@
     - proxies
     - docker
     - ipaserver
-    - ipaserver-settings
+    - ipaserver_settings
     - users
 
 
@@ -92,20 +92,20 @@
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - subidmap
-    - nfs-client
+    - nfs_client
 
 - hosts: managed_cluster_compute
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - update
-    - c-nodes
+    - c_nodes
     - security
 
 - hosts: nfs_servers
   environment: "{{ proxy_env | default({}) }}"
   roles:
-    - docker-user-config
+    - docker_user_config
 
 - hosts: tio
   become: true
@@ -116,8 +116,8 @@
   roles:
     - update
     - security
-    - tio-users
-    - tio-devtools
+    - tio_users
+    - tio_devtools
     - seafile
 
 
@@ -130,7 +130,7 @@
   roles:
     - update
     - security
-    - tio-nfsexport
+    - tio_nfsexport
 
 
 - hosts: tionfsclients
@@ -142,4 +142,4 @@
   roles:
     - update
     - security
-    - tio-nfsmount
+    - tio_nfsmount

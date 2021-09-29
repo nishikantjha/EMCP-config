@@ -1,0 +1,24 @@
+---
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - unzip
+      - qemu
+      - qemu-utils
+      - qemu-system-x86
+    state: present
+  tags:
+    - dgx_image_maas
+
+- name: Create and populate the work directory
+  become: false
+  block:
+    - include_tasks: workdir.yml
+  tags:
+    - dgx_image_maas
+
+- name: Create the DGX OS image and upload it to MAAS
+  block:
+    - include_tasks: dgxos-maas.yml
+  tags:
+    - dgx_image_maas

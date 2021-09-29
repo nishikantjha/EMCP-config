@@ -1,0 +1,74 @@
+---
+- name: Discover users in the groups "tio", "ship" and "docker"
+  block:
+    - name: Collect users from group "tio"
+      ansible.builtin.set_fact:
+        tio_users: "{{ tio_users_item['user'] }}"
+      when: tio_users_item['cn'] == 'tio'
+      loop: "{{ ipagroups }}"
+      loop_control:
+        loop_var: tio_users_item
+
+    - name: Collect users from group "ship"
+      ansible.builtin.set_fact:
+        ship_users: "{{ tio_users_item['user'] }}"
+      when: tio_users_item['cn'] == 'ship'
+      loop: "{{ ipagroups }}"
+      loop_control:
+        loop_var: tio_users_item
+
+    - name: Merge users in "tio" and "ship" as they share the GPU hosts
+      ansible.builtin.set_fact:
+        authorized_users: "{{ tio_users | union(ship_users) }}"
+
+    - name: Collect docker users
+      ansible.builtin.set_fact:
+        docker_users: "{{ tio_users_item['user'] }}"
+      when: tio_users_item['cn'] == 'docker'
+      loop: "{{ ipagroups }}"
+      loop_control:
+        loop_var: tio_users_item
+  run_once: true
+  tags: tio_users
+
+- name: Create the common primary group
+  ansible.builtin.group:
+    name: default
+    state: present
+  tags: tio_users
+
+- name: Create users from authorized_users
+  ansible.builtin.user:
+    name: "{{ tio_users_item['name'] }}"
+    group: default
+    shell: "{{ tio_users_item['loginshell'] | default('/bin/bash') }}"
+    state: present
+  when: tio_users_item['name'] in authorized_users
+  loop: "{{ ipausers }}"
+  loop_control:
+    loop_var: tio_users_item
+  tags: tio_users
+
+- name: Add authorized keys
+  ansible.posix.authorized_key:
+    user: "{{ tio_users_item['name'] }}"
+    key: "{{ tio_users_item['sshpubkey'] | join('\n') }}"
+    exclusive: true
+    state: present
+  when: tio_users_item['name'] in authorized_users
+  loop: "{{ ipausers }}"
+  loop_control:
+    loop_var: tio_users_item
+  tags: tio_users
+
+- name: Add users from docker_users to the docker group
+  ansible.builtin.user:
+    name: "{{ tio_users_item }}"
+    groups: docker
+    append: true
+    state: present
+  when: tio_users_item in authorized_users
+  loop: "{{ docker_users }}"
+  loop_control:
+    loop_var: tio_users_item
+  tags: tio_users

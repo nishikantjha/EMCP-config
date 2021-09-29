@@ -1,0 +1,1 @@
+packer_workdir: "{{ packer_maas_working_copy }}/dgxos5"

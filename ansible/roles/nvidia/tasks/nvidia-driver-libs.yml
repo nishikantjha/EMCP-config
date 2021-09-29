@@ -2,7 +2,7 @@
   vars:
     nvidia_driver_ubuntu_install_from_cuda_repo: true
     nvidia_driver_ubuntu_cuda_package: "{{ cuda_package_name }}"
-  include_role:
+  ansible.builtin.include_role:
     name: nvidia.nvidia_driver
 
 - name: Add the cuda compiler to PATH

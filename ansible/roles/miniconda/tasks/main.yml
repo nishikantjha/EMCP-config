@@ -1,13 +1,21 @@
 ---
+
+- name: check if conda is present
+  ansible.builtin.command: conda --version
+  changed_when: false
+  failed_when: false
+  register: cmd_conda_version
+
 - name: download miniconda
-  get_url:
+  ansible.builtin.get_url:
     url: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     dest: /tmp/install-miniconda.sh
     mode: 0755
+  when: cmd_conda_version.rc != 0
 
 - name: create conda folder
   become: true
-  file:
+  ansible.builtin.file:
     path: /opt/miniconda
     state: directory
     owner: root
@@ -15,16 +23,17 @@
     mode: 0755
 
 - name: run miniconda installer
-  shell: /tmp/install-miniconda.sh -b -u -p /opt/miniconda
+  ansible.builtin.command: /tmp/install-miniconda.sh -b -u -p /opt/miniconda
+  when: cmd_conda_version.rc != 0
 
 - name: remove miniconda installer
-  file:
+  ansible.builtin.file:
     state: absent
     path: /tmp/install-miniconda.sh
 
 - name: add to path
   become: true
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/profile.d/miniconda.sh"
     content: |
       export PATH=/opt/miniconda/bin:$PATH
@@ -39,7 +48,7 @@
 
 - name: miniconda +r+x for all
   become: true
-  file:
+  ansible.builtin.file:
     path: /opt/miniconda
     mode: 0755
     recurse: true

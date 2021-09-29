@@ -1,0 +1,47 @@
+---
+
+- name: include ipa services tasks
+  block:
+    - include_tasks: create_services.yml
+  run_once: true
+  tags:
+    - ipa-services
+    - ipa-settings
+
+- name: include ipa services tasks
+  block:
+    - include_tasks: ensure_general_config.yml
+  run_once: true
+  tags:
+    - ipa-settings
+
+- name: include ipa hostgroups tasks
+  block:
+    - include_tasks: create_hostgroups.yml
+  run_once: true
+  tags:
+    - ipa-settings
+    - ipa-hostgroups
+
+- name: include ipa habac rule tasks
+  block:
+    - include_tasks: create_hbacrules.yml
+  run_once: true
+  tags:
+    - ipa-settings
+    - ipa-hbacrules
+
+# FIXME: kerberos authentication needed to automatically create the automountmaps
+# - name: include automountmaps tasks
+#   block:
+#     - include_tasks: create_automountmaps.yml
+#   run_once: true
+#   loop:
+#     - homes
+#     - projects
+#     - groups
+#   loop_control:
+#     loop_var: mapname
+#   tags:
+#     - ipa-automountmaps
+#     - ipa-settings

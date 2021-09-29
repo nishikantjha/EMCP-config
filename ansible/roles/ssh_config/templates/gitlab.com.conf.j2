@@ -1,0 +1,5 @@
+Host gitlab.com
+  User git
+  HostName altssh.gitlab.com
+  Port 443
+  ProxyCommand socat - PROXY:{{ http_proxy_host }}:%h:%p,proxyport={{ http_proxy_port }}

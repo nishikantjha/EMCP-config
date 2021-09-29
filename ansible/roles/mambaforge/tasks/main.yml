@@ -1,16 +1,24 @@
 # per https://github.com/conda-forge/miniforge
 # setup mambaforge
 
+- name: check if conda is present
+  ansible.builtin.command: conda --version
+  changed_when: false
+  failed_when: false
+  register: cmd_conda_version
+
 - name: Download mambaforge installer
   ansible.builtin.get_url:
     url: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
     dest: /tmp/mambaforge.sh
+  when: cmd_conda_version.rc != 0
 
 - name: Install mambaforge into /opt/mambaforge
-  shell: bash /tmp/mambaforge.sh -b -p /opt/mambaforge
+  ansible.builtin.command: bash /tmp/mambaforge.sh -b -p /opt/mambaforge
+  when: cmd_conda_version.rc != 0
 
 - name: Set permissions
-  file:
+  ansible.builtin.file:
     path: /opt/mambaforge
     owner: root
 #    group: # TODO is there already a group for all people who should be allowed to deploy packages and environments?
@@ -19,6 +27,6 @@
     recurse: true
 
 - name: Remove mambaforge installer
-  file:
+  ansible.builtin.file:
     path: /tmp/mambaforge.sh
     state: absent
