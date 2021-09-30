@@ -41,7 +41,7 @@
     subid_start: "{{ subidmap_item }}"
   when:
     - last_ipa_id is defined
-    - item > last_ipa_id|int
+    - subidmap_item > last_ipa_id|int
   loop:
     - 2147483648
     - 1073741824
