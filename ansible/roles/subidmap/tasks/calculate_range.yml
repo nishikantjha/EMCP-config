@@ -5,22 +5,31 @@
     name: krb5-user
     state: present
 
+- name: Check whether a valid kerberos ticket is present
+  ansible.builtin.command: klist -s
+  changed_when: false
+  failed_when: false
+  register: cmd_klist
+
 - name: Obtain a ticket using the default keytab on the current client
   ansible.builtin.command: kinit -k
-  changed_when: false   # FIXME the role needs to be reworked for idempotency
+  changed_when: true
+  when:
+    - cmd_klist['rc'] is defined
+    - cmd_klist['rc'] != 0
 
 - name: Query the server
   ansible.builtin.command: ipa idrange-find
   changed_when: false
-  register: idrange_command
+  register: cmd_idrange
 
 - name: Extract the first allocated IPA ID and the number of possible IPA IDs
   vars:
-    parsed_ints: "{{ idrange_command['stdout'] | regex_findall('range: (\\d+)') }}"
+    parsed_ints: "{{ cmd_idrange['stdout'] | regex_findall('range: (\\d+)') }}"
   ansible.builtin.set_fact:
     first_ipa_id: "{{ parsed_ints[0] }}"
     ipa_range_size: "{{ parsed_ints[1] }}"
-  when: idrange_command['stdout'] is defined
+  when: cmd_idrange['stdout'] is defined
 
 - name: Calculate the last possible IPA ID
   ansible.builtin.set_fact:
