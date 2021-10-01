@@ -50,6 +50,7 @@
     - docker
     - nvidia
     - miniconda
+    - g_node_devtools
 
 
 - hosts: ipaserver

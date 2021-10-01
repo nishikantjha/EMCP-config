@@ -1,0 +1,8 @@
+---
+- name: Install development tools
+  ansible.builtin.apt:
+    name:
+      - python3-venv
+      - openslide-tools
+    state: present
+  tags: g-node-devtools
