@@ -1,0 +1,6 @@
+[storage]
+driver = "overlay"
+graphroot = "{{ container_storage_root }}/$USER/storage"
+
+[storage.options.overlay]
+mount_program = "/usr/bin/fuse-overlayfs"

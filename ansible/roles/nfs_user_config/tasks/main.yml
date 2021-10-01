@@ -1,0 +1,23 @@
+---
+
+- name: get all home directories
+  ansible.builtin.find:
+    paths: "{{ homes_share_root }}"
+    file_type: directory
+    recurse: false
+  register: home_directories
+  tags: user-home-config
+
+- name: Make Docker aware of the http proxy
+  block:
+    - include_tasks: docker-user-proxy-config.yml
+  tags:
+    - user-home-config
+    - docker-user-proxy
+
+- name: Configure storage for rootless containers
+  block:
+    - include_tasks: container-storage.yml
+  tags:
+    - user-home-config
+    - container-storage

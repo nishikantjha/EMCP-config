@@ -1,0 +1,12 @@
+---
+- name: Install Podman
+  block:
+    - include_tasks: podman-install.yml
+  tags: podman
+
+- name: Prepare the parent directory for rootless container storage
+  ansible.builtin.file:
+    path: "{{ container_storage_root }}"
+    state: directory
+    mode: 0777
+  tags: podman
