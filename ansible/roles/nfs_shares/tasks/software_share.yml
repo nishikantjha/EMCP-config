@@ -1,0 +1,18 @@
+---
+
+- name: ensure directory structure is present
+  ansible.builtin.file:
+    path: "{{ software_share_root }}/{{ nfs_shares_item }}"
+    state: directory
+    mode: 02775
+    recurse: false
+    owner: root
+    group: software_install
+  loop:
+    - lib
+    - share
+    - bin
+    - man
+  loop_control:
+    loop_var: nfs_shares_item
+  become: true

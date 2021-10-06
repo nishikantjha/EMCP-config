@@ -1,0 +1,32 @@
+---
+
+- name: ensure nfs share directories are present
+  ansible.builtin.file:
+    path: "{{ nfs_share_root }}/{{ nfs_shares_item }}"
+    mode: '0755'
+    owner: root
+    group: root
+    recurse: false
+    state: directory
+  loop: "{{ nfs_share_list }}"
+  loop_control:
+    loop_var: nfs_shares_item
+  become: true
+  tags: nfs_shares
+
+- name: write exports file
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports
+    mode: 0644
+    owner: root
+    group: root
+  notify: reload nfs
+  become: true
+  tags: nfs_shares
+
+- name: ensure the presence of the software share
+  block:
+    - include_tasks: software_share.yml
+  tags:
+    - nfs_shares

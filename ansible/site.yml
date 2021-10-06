@@ -25,6 +25,7 @@
     - docker
     - security
 
+
 - hosts: server
   become: true
   ignore_errors: true
@@ -95,6 +96,7 @@
     - subidmap
     - nfs_client
 
+
 - hosts: managed_cluster_compute
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
@@ -103,10 +105,13 @@
     - c_nodes
     - security
 
+
 - hosts: nfs_servers
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - nfs_user_config
+    - nfs_shares
+
 
 - hosts: tio
   become: true
