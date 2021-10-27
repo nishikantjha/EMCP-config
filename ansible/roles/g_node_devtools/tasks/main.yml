@@ -3,6 +3,7 @@
   ansible.builtin.apt:
     name:
       - python3-venv
+      - tmux
       - openslide-tools
     state: present
   tags: g-node-devtools
