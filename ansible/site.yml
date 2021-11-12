@@ -103,6 +103,7 @@
   roles:
     - update
     - c_nodes
+    - proxies
     - security
 
 

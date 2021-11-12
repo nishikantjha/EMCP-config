@@ -8,10 +8,14 @@
     mode: 0755
   tags:
     - proxy
+  become: true
 
 - name: gather information about installed packages
   ansible.builtin.package_facts:
     manager: apt
+  tags:
+    - proxy
+  become: true
 
 - name: Set up proxy variables in zsh
   ansible.builtin.blockinfile:
@@ -24,3 +28,4 @@
   when: "'zsh' in ansible_facts.packages"
   tags:
     - proxy
+  become: true
