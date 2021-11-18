@@ -32,3 +32,14 @@
     - hibernate.target
     - hybrid-sleep.target
   tags: no-hibernation
+
+- name: Disable unattended upgrades
+  ansible.builtin.copy:
+    src: 99no-auto-upgrades
+    # The destination filename must start with 99 in order to override any
+    # existing defaults (20auto-upgrades).
+    dest: /etc/apt/apt.conf.d/99no-auto-upgrades
+    owner: root
+    group: root
+    mode: 0644
+  tags: no-auto-upgrades
