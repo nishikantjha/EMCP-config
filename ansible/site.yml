@@ -121,32 +121,15 @@
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
   roles:
-    - update
-    - security
     - tio_users
     - tio_devtools
+
+
+- hosts: ship
+  become: true
+  ignore_errors: true
+  remote_user: ubuntu
+  gather_facts: true
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
     - seafile
-
-
-- hosts: tionfsserver
-  become: true
-  ignore_errors: true
-  remote_user: ubuntu
-  gather_facts: true
-  environment: "{{ proxy_env | default({}) }}"
-  roles:
-    - update
-    - security
-    - tio_nfsexport
-
-
-- hosts: tionfsclients
-  become: true
-  ignore_errors: true
-  remote_user: ubuntu
-  gather_facts: true
-  environment: "{{ proxy_env | default({}) }}"
-  roles:
-    - update
-    - security
-    - tio_nfsmount
