@@ -2,8 +2,8 @@
 
 - name: ensure that hostgroups are present
   community.general.ipa_hostgroup:
-    name: "{{ hostgroup_item['name'] }}"
-    host: "{{ hostgroup_item['host'] }}"
+    name: "{{ ipaserver_settings_item['name'] }}"
+    host: "{{ ipaserver_settings_item['host'] }}"
     ipa_host: "{{ primary_ipaserver }}"
     ipa_pass: "{{ ipaadmin_password }}"
     validate_certs: false
@@ -14,5 +14,5 @@
     - name: ship
       host: "{{ groups['ship'] }}"
   loop_control:
-    loop_var: hostgroup_item
+    loop_var: ipaserver_settings_item
   become: true

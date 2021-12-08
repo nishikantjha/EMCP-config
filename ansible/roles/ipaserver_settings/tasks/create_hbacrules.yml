@@ -15,10 +15,10 @@
 
 - name: ensure that hostgroups can be accessed by the intended usergroup via ssh
   community.general.ipa_hbacrule:
-    name: "{{ hbacrule_ssh_item['name'] }}"
-    description: "{{ hbacrule_ssh_item['description'] }}"
-    hostgroup: "{{ hbacrule_ssh_item['hostgroup'] }}"
-    usergroup: "{{ hbacrule_ssh_item['usergroup'] }}"
+    name: "{{ ipaserver_settings_item['name'] }}"
+    description: "{{ ipaserver_settings_item['description'] }}"
+    hostgroup: "{{ ipaserver_settings_item['hostgroup'] }}"
+    usergroup: "{{ ipaserver_settings_item['usergroup'] }}"
     service: sshd
     ipa_host: "{{ primary_ipaserver }}"
     ipa_pass: "{{ ipaadmin_password }}"
@@ -34,7 +34,7 @@
       hostgroup: ship
       usergroup: ship
   loop_control:
-    loop_var: hbacrule_ssh_item
+    loop_var: ipaserver_settings_item
   become: true
 
 - name: ensure allow_all rule is disabled
