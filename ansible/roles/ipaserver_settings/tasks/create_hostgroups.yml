@@ -8,11 +8,7 @@
     ipa_pass: "{{ ipaadmin_password }}"
     validate_certs: false
     state: present
-  loop:
-    - name: regular_cluster_servers
-      host: "{{ groups['managed_cluster'] }}"
-    - name: ship
-      host: "{{ groups['ship'] }}"
+  loop: "{{ ipa_host_groups }}"
   loop_control:
     loop_var: ipaserver_settings_item
   become: true

@@ -15,24 +15,16 @@
 
 - name: ensure that hostgroups can be accessed by the intended usergroup via ssh
   community.general.ipa_hbacrule:
-    name: "{{ ipaserver_settings_item['name'] }}"
-    description: "{{ ipaserver_settings_item['description'] }}"
-    hostgroup: "{{ ipaserver_settings_item['hostgroup'] }}"
+    name: "{{ ipaserver_settings_item['hbacrule_name'] }}"
+    description: "{{ ipaserver_settings_item['hbacrule_description'] }}"
+    hostgroup: "{{ ipaserver_settings_item['name'] }}"
     usergroup: "{{ ipaserver_settings_item['usergroup'] }}"
     service: sshd
     ipa_host: "{{ primary_ipaserver }}"
     ipa_pass: "{{ ipaadmin_password }}"
     validate_certs: false
     state: present
-  loop:
-    - name: allow_users_cluster
-      description: Allow regular users to access the cluster hosts via ssh
-      hostgroup: regular_cluster_servers
-      usergroup: ipausers
-    - name: allow_users_ship
-      description: Allow SHIP users to access dedicated SHIP hosts via ssh
-      hostgroup: ship
-      usergroup: ship
+  loop: "{{ ipa_host_groups }}"
   loop_control:
     loop_var: ipaserver_settings_item
   become: true
