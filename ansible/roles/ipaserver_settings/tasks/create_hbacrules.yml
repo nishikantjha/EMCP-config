@@ -13,17 +13,28 @@
     state: present
   become: true
 
-- name: ensure cluster hosts can be accessed by normal users via ssh
+- name: ensure that hostgroups can be accessed by the intended usergroup via ssh
   community.general.ipa_hbacrule:
-    name: allow_users_cluster
-    description: Allow regular users to access the cluster hosts via ssh
-    hostgroup: regular_cluster_servers
+    name: "{{ hbacrule_ssh_item['name'] }}"
+    description: "{{ hbacrule_ssh_item['description'] }}"
+    hostgroup: "{{ hbacrule_ssh_item['hostgroup'] }}"
+    usergroup: "{{ hbacrule_ssh_item['usergroup'] }}"
     service: sshd
-    usergroup: ipausers
     ipa_host: "{{ primary_ipaserver }}"
     ipa_pass: "{{ ipaadmin_password }}"
     validate_certs: false
     state: present
+  loop:
+    - name: allow_users_cluster
+      description: Allow regular users to access the cluster hosts via ssh
+      hostgroup: regular_cluster_servers
+      usergroup: ipausers
+    - name: allow_users_ship
+      description: Allow SHIP users to access dedicated SHIP hosts via ssh
+      hostgroup: ship
+      usergroup: ship
+  loop_control:
+    loop_var: hbacrule_ssh_item
   become: true
 
 - name: ensure allow_all rule is disabled

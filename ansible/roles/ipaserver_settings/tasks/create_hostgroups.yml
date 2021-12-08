@@ -1,11 +1,18 @@
 ---
 
-- name: ensure regular cluster hostgroup is present
+- name: ensure that hostgroups are present
   community.general.ipa_hostgroup:
-    name: regular_cluster_servers
-    host: "{{ groups['managed_cluster'] }}"
+    name: "{{ hostgroup_item['name'] }}"
+    host: "{{ hostgroup_item['host'] }}"
     ipa_host: "{{ primary_ipaserver }}"
     ipa_pass: "{{ ipaadmin_password }}"
     validate_certs: false
     state: present
+  loop:
+    - name: regular_cluster_servers
+      host: "{{ groups['managed_cluster'] }}"
+    - name: ship
+      host: "{{ groups['ship'] }}"
+  loop_control:
+    loop_var: hostgroup_item
   become: true
