@@ -4,6 +4,7 @@
     name:
       - python3-venv
       - tmux
+      - zsh
       - openslide-tools
       - rename
     state: present
