@@ -1,0 +1,12 @@
+---
+- name: Check whether a docker group already exists in IPA
+  block:
+  - include_tasks: ipa_group_exists.yml
+  run_once: true
+  tags: ipaclient-deduplicate-groups
+
+- name: If the docker group is managed in IPA, remove the local duplicate
+  block:
+  - include_tasks: docker_group_deduplicate.yml
+  when: docker_group_exists
+  tags: ipaclient-deduplicate-groups
