@@ -85,6 +85,7 @@
       state: present
       tags: freeIPA-client
     - role: subidmap
+    - role: ipaclient_deduplicate_groups
 
 
 - hosts: managed_cluster
