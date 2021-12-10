@@ -1,0 +1,41 @@
+---
+- name: remove old docker install
+  ansible.builtin.apt:
+    name: ['docker', 'docker-engine', 'docker.io', 'containerd', 'runc']
+    state: absent
+
+- name: Install prerequisites for https apt repositories
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: present
+
+- name: Add Docker GPG key
+  ansible.builtin.apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ http_proxy }}"
+
+- name: Add Docker APT repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+
+- name: install Docker Engine and the Docker SDK for Python
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      # The Docker SDK for Python is required to use the Ansible Docker collection.
+      - python3-docker
+    state: present
+    update_cache: true
+
+- name: Start and enable the docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
