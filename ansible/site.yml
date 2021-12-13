@@ -111,8 +111,8 @@
 - hosts: nfs_servers
   environment: "{{ proxy_env | default({}) }}"
   roles:
-    - nfs_user_config
     - nfs_shares
+    - user_skel
 
 
 - hosts: tio
@@ -123,6 +123,7 @@
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - tio_users
+    - user_skel
 
 
 - hosts: ship
@@ -133,3 +134,4 @@
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - seafile
+    - user_skel

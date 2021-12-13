@@ -1,0 +1,16 @@
+---
+- name: Configure proxy settings for Docker containers
+  become: true
+  block:
+    - include_tasks: docker-user-proxy-config.yml
+  tags:
+    - user-home-config
+    - docker-user-proxy-config
+
+- name: Configure storage for rootless containers
+  become: true
+  block:
+    - include_tasks: container-storage.yml
+  tags:
+    - user-home-config
+    - container-storage

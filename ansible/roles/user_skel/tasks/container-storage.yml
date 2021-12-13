@@ -1,0 +1,17 @@
+---
+- name: Create .the config/containers directory if it doesn't exist
+  ansible.builtin.file:
+    path: /etc/skel/.config/containers
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: Copy the rootless container storage configuration
+  ansible.builtin.template:
+    src: containers-storage.conf.j2
+    dest: /etc/skel/.config/containers/storage.conf
+    owner: root
+    group: root
+    mode: 0644
+    force: true
