@@ -1,3 +1,5 @@
 docker_compose_url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
 docker_compose_digest_url: "{{ docker_compose_url }}.sha256"
-docker_compose_dest: /usr/bin/docker-compose
+
+# The cli-plugins directory can be discovered with `dpkg -L docker-ce-cli | grep cli-plugins`
+docker_cli_plugins_dir: /usr/libexec/docker/cli-plugins
