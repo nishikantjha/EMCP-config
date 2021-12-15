@@ -1,6 +1,5 @@
 ---
 
-# setup rancher on k01-20
 - hosts: k8s
   become: true
   ignore_errors: true
@@ -12,7 +11,6 @@
   roles:
     - update
     - docker
-    - rancher
     - security
 
 
