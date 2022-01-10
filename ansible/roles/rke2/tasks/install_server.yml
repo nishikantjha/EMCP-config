@@ -59,3 +59,10 @@
     state: started
     enabled: true
   become: true
+
+- name: set the first_run_server variable
+  ansible.builtin.set_fact:
+    first_run_server: "{{ inventory_hostname }}"
+  when: 
+    - first_run_server is not defined
+    - rke2_type == "server"
