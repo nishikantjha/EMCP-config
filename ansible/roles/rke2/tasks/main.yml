@@ -1,4 +1,15 @@
 
+- name: include keepalived tasks
+  block:
+    - include_tasks: keepalived.yml
+  tags:
+    - rke2
+    - rke2-keepalived
+  when:
+    - rke2_api_ip is defined
+    - inventory_hostname in groups[rke2_servers_group_name]
+    - rke2_ha_mode
+
 - name: include rke2 install tasks
   block:
     - include_tasks: install.yml
