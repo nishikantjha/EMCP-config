@@ -1,0 +1,72 @@
+
+- name: download the rke2 installation script
+  ansible.builtin.get_url:
+    url: "{{ rke2_install_script_url }}"
+    dest: /tmp/rke2.sh
+
+- name: make the install script executable
+  ansible.builtin.file:
+    dest: /tmp/rke2.sh
+    mode: 0500
+
+- name: populate service facts
+  ansible.builtin.service_facts:
+  become: true
+
+- name: get installed rke2 version
+  ansible.builtin.shell: |
+    set -o pipefail
+    /usr/local/bin/rke2 --version | grep -E "rke --version" | awk '{print $3}'
+  args:
+    executable: /bin/bash
+  changed_when: false
+  register: installed_rke2_version
+  when: "rke2-server.service" in ansible_facts['services']
+
+- name: run the rke2 install script
+  ansible.builtin.command: /tmp/rke2.sh
+  environment:
+    INSTALL_RKE2_VERSION: "{{ rke2_version }}"
+    INSTALL_RKE2_CHANNEL_URL: "{{ rke2_channel_url }}"
+    INSTALL_RKE2_CHANNEL: "{{ rke2_channel }}"
+    INSTALL_RKE2_TYPE: "{{ rke2_type }}"
+    INSTALL_RKE2_METHOD: "{{ rke2_method }}"
+  when: (rke2_version != ( installed_rke2_version.stdout | default({})))
+        or installed_rke2_version is not defined
+  become: true
+
+- name: write the rke2 config file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /etc/rancher/rke2/config.yaml
+    mode: 0644
+    owner: root
+    group: root
+  become: true
+
+- name: ensure rke2 default env file is present
+  ansible.builtin.file:
+    path: /etc/default/rke2-server
+    state: present
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+
+- name: write proxy settings to rke2-server systemd unit env file
+  ansible.builtin.lineinfile:
+    dest: /usr/local/lib/systemd/system/rke2-server.env
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  become: true
+  loop:
+    - { regexp: '^HTTP_PROXY', line: "HTTP_PROXY: {{ http_proxy }}" }
+    - { regexp: '^HTTPS_PROXY', line: "HTTPS_PROXY: {{ http_proxy }}" }
+    - { regexp: '^NO_PROXY', line: "NO_PROXY: {{ no_proxy }}" }
+
+- name: start and enable the systemd service
+  ansible.builtin.systemd:
+    name: rke2-server.service
+    state: started
+    enabled: true
+  become: true
