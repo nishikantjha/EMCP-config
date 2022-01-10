@@ -44,9 +44,9 @@
     group: root
   become: true
 
-- name: write proxy settings to rke2-server systemd unit env file
+- name: write proxy settings to rke2 systemd unit env file
   ansible.builtin.template:
-    src: rke2-server.env.j2
+    src: rke2.env.j2
     dest: "/etc/default/rke2-{{ rke2_type }}"
     mode: 0644
     owner: root
