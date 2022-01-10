@@ -43,27 +43,15 @@
     owner: root
     group: root
   become: true
-  when: rke2_type == "server"
 
 - name: write proxy settings to rke2-server systemd unit env file
   ansible.builtin.template:
     src: rke2-server.env.j2
-    dest: /etc/default/rke2-server
+    dest: "/etc/default/rke2-{{ rke2_type }}"
     mode: 0644
     owner: root
     group: root
   become: true
-  when: rke2_type == "server"
-
-- name: write proxy settings to rke2-agent systemd unit env file
-  ansible.builtin.template:
-    src: rke2-server.env.j2
-    dest: /etc/default/rke2-agent
-    mode: 0644
-    owner: root
-    group: root
-  become: true
-  when: rke2_type == "agent"
 
 - name: start and enable the systemd service
   ansible.builtin.systemd:
