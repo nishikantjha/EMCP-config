@@ -21,7 +21,7 @@
     executable: /bin/bash
   changed_when: false
   register: installed_rke2_version
-  when: "rke2-server.service" in ansible_facts['services']
+  when: "rke2-{{ rke2_type }}.service" in ansible_facts['services']
 
 - name: run the rke2 install script
   ansible.builtin.command: /tmp/rke2.sh
