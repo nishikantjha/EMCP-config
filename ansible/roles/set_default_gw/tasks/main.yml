@@ -1,0 +1,27 @@
+
+- set_fact:
+    temp_dict: "{{ lookup('vars', 'ansible_' + item)['ipv4']['network'] }}"
+  loop: "{{ ansible_interfaces }}"
+  when: 
+    - lookup('vars', 'ansible_' + item)['active']
+    - lookup('vars', 'ansible_' + item)['ipv4']['network'] == main_network
+  register: test_var
+
+- set_fact: 
+    main_interface: "{{ test_var['results'] | selectattr('skipped', 'undefined') | first | community.general.json_query('item') }}"
+
+- name: retrieve cloud-init information
+  community.general.cloud_init_data_facts:
+  register: cloud_init_res
+  become: true
+
+- name: write netplan default gw config
+  ansible.builtin.template:
+    src: 60-default-gw.yml.j2
+    dest: /etc/netplan/60-default-gw.yaml
+    owner: root
+    group: root
+    mode: 0644
+  when: cloud_init_res['cloud_init_data_facts']['status']['v1']['stage'] is defined
+  become: true
+  notify: apply netplan config

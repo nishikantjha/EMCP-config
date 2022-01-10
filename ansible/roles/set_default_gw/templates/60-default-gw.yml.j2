@@ -1,0 +1,6 @@
+network:
+  ethernets:
+    {{ main_interface }}:
+      routes:
+        - to: default
+          via: {{ default_gw }}
