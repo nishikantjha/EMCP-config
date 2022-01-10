@@ -55,7 +55,7 @@
 
 - name: start and enable the systemd service
   ansible.builtin.systemd:
-    name: rke2-server.service
+    name: "rke2-{{ rke2_type }}.service"
     state: started
     enabled: true
   become: true
