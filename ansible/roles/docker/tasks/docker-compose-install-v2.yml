@@ -1,15 +1,20 @@
 ---
 # The Ubuntu package of Docker Compose cannot be used as it pulls outdated
 # depdendencies which clash with the Docker Engine installation
-- name: Download the Docker Compose executable
+- name: Remove Docker Compose V1
+  ansible.builtin.file:
+    path: /usr/bin/docker-compose
+    state: absent
+
+- name: Download the Docker Compose v2 executable
   ansible.builtin.get_url:
-    url: "{{ docker_compose_url }}"
+    url: "{{ docker_compose_v2_url }}"
     dest: "{{ docker_cli_plugins_dir }}/docker-compose"
     owner: root
     group: root
     mode: 0755
-    checksum: "sha256:{{ lookup('url', docker_compose_digest_url) | regex_search('[0-9a-f]{64}') }}"
+    checksum: "sha256:{{ lookup('url', docker_compose_v2_digest_url) | regex_search('[0-9a-f]{64}') }}"
 
-- name: Test the Docker Compose installation
+- name: Test the installation
   ansible.builtin.command: docker compose version
   changed_when: false
