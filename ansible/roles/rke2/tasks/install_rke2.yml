@@ -3,11 +3,9 @@
   ansible.builtin.get_url:
     url: "{{ rke2_install_script_url }}"
     dest: /tmp/rke2.sh
-
-- name: make the install script executable
-  ansible.builtin.file:
-    dest: /tmp/rke2.sh
     mode: 0500
+  environment: "{{ proxy_env }}"
+  become: true
 
 - name: populate service facts
   ansible.builtin.service_facts:
@@ -21,7 +19,7 @@
     executable: /bin/bash
   changed_when: false
   register: installed_rke2_version
-  when: "rke2-{{ rke2_type }}.service" in ansible_facts['services']
+  when: ("rke2-" + rke2_type + ".service") in ansible_facts['services']
 
 - name: run the rke2 install script
   ansible.builtin.command: /tmp/rke2.sh
@@ -31,9 +29,32 @@
     INSTALL_RKE2_CHANNEL: "{{ rke2_channel }}"
     INSTALL_RKE2_TYPE: "{{ rke2_type }}"
     INSTALL_RKE2_METHOD: "{{ rke2_method }}"
+    HTTP_PROXY: "{{ http_proxy }}"
+    HTTPS_PROXY: "{{ http_proxy }}"
+    NO_PROXY: "{{ no_proxy }}"
   when: (rke2_version != ( installed_rke2_version.stdout | default({})))
         or installed_rke2_version is not defined
   become: true
+
+- name: retrieve primary active server
+  ansible.builtin.uri:
+    url: "https://{{ rke2_server_url }}:{{ rke2_apiserver_dest_port }}"
+    method: GET
+    return_content: true
+    use_proxy: false
+    validate_certs: false
+    status_code:
+      - 200
+      - "-1"
+  register: apiserver_curl
+
+- set_fact:
+    current_server_is_not_first: true
+  when: apiserver_curl['status'] == 200
+
+- set_fact:
+    current_server_is_not_first: false
+  when: apiserver_curl['status'] != 200
 
 - name: write the rke2 config file
   ansible.builtin.template:

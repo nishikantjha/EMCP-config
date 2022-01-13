@@ -1,4 +1,7 @@
 token: {{ rke2_token }}
+{% if current_server_is_not_first %}
+server: {{ rke2_server_url }}
+{% endif %}
 
 write-kubeconfig: {{ rke2_download_kubeconf_path }}/{{ rke2_download_kubeconf_file_name }}
 write-kubeconfig-mode: "0644"
