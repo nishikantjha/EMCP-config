@@ -10,9 +10,17 @@
     - inventory_hostname in groups[rke2_servers_group_name]
     - rke2_ha_mode
 
+- name: include disable swap tasks
+  block:
+    - include_tasks: disable_swap.yml
+  tags:
+    - rke2
+    - rke2-disable-swap
+
 - name: include rke2 install tasks
   block:
     - include_tasks: install_rke2.yml
   tags:
     - rke2
     - install-rke2
+  run_once: true
