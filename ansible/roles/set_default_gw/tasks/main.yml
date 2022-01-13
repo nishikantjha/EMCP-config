@@ -4,6 +4,8 @@
   loop: "{{ ansible_interfaces }}"
   when: 
     - lookup('vars', 'ansible_' + item)['active']
+    - '"flannel" not in item'
+    - '"cali" not in item'
     - lookup('vars', 'ansible_' + item)['ipv4']['network'] == main_network
   register: test_var
 
