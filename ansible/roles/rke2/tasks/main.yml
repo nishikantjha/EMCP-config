@@ -33,9 +33,9 @@
     use_proxy: false
     validate_certs: false
     status_code:
-      - 200
+      - 401
   register: apiserver_query_response
-  until: apiserver_query_response['status'] == 200
+  until: apiserver_query_response['status'] == 401
   retries: 50
   delay: 15
 

@@ -24,7 +24,7 @@
 - name: run the rke2 install script
   ansible.builtin.command: /tmp/rke2.sh
   environment:
-    INSTALL_RKE2_VERSION: "{{ rke2_version }}"
+    # INSTALL_RKE2_VERSION: "{{ rke2_version }}"
     INSTALL_RKE2_CHANNEL_URL: "{{ rke2_channel_url }}"
     INSTALL_RKE2_CHANNEL: "{{ rke2_channel }}"
     INSTALL_RKE2_TYPE: "{{ rke2_type }}"
@@ -44,17 +44,24 @@
     use_proxy: false
     validate_certs: false
     status_code:
-      - 200
+      - 401
       - "-1"
   register: apiserver_curl
 
 - set_fact:
     current_server_is_not_first: true
-  when: apiserver_curl['status'] == 200
+  when: apiserver_curl['status'] == 401
 
 - set_fact:
     current_server_is_not_first: false
-  when: apiserver_curl['status'] != 200
+  when: apiserver_curl['status'] != 401
+
+- name: create rke2 config dir
+  ansible.builtin.file:
+    path: /etc/rancher/rke2
+    state: directory
+    mode: 0644
+  become: true
 
 - name: write the rke2 config file
   ansible.builtin.template:
