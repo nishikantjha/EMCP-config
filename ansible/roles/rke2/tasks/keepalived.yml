@@ -6,7 +6,7 @@
   become: true
 
 - name: Create directory for keepalived
-  file:
+  ansible.builtin.file:
     path: /etc/keepalived
     state: directory
     owner: root
@@ -14,8 +14,16 @@
     mode: 0755
   become: true
 
+- name: Create the keepalived_script user
+  ansible.builtin.user:
+    name: keepalived_script
+    create_home: false
+    system: true
+    state: present
+  become: true
+
 - name: Create Kubernetes API health check script
-  template:
+  ansible.builtin.template:
     src: templates/check_apiserver.sh.j2
     dest: /etc/keepalived/check_apiserver.sh
     owner: root
@@ -25,7 +33,7 @@
   notify: restart keepalived
 
 - name: Create keepalived config file
-  template:
+  ansible.builtin.template:
     src: templates/keepalived.conf.j2
     dest: /etc/keepalived/keepalived.conf
     owner: root
@@ -35,7 +43,7 @@
   notify: restart keepalived
 
 - name: Enable keepalived and make sure it is not masked
-  systemd:
+  ansible.builtin.systemd:
     name: keepalived
     enabled: yes
     masked: no
