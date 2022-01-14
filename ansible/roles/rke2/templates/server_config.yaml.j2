@@ -1,6 +1,6 @@
 token: {{ rke2_token }}
 {% if current_server_is_not_first %}
-server: {{ rke2_server_url }}
+server: https://{{ rke2_server_url }}:9345
 {% endif %}
 
 write-kubeconfig: {{ rke2_download_kubeconf_path }}/{{ rke2_download_kubeconf_file_name }}
