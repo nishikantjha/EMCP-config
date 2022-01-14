@@ -24,7 +24,7 @@
 - name: run the rke2 install script
   ansible.builtin.command: /tmp/rke2.sh
   environment:
-    # INSTALL_RKE2_VERSION: "{{ rke2_version }}"
+    INSTALL_RKE2_VERSION: "{{ rke2_version }}"
     INSTALL_RKE2_CHANNEL_URL: "{{ rke2_channel_url }}"
     INSTALL_RKE2_CHANNEL: "{{ rke2_channel }}"
     INSTALL_RKE2_TYPE: "{{ rke2_type }}"
@@ -71,6 +71,7 @@
     owner: root
     group: root
   become: true
+  notify: "restart rke2-{{ rke2_type }}"
 
 - name: write proxy settings to rke2 systemd unit env file
   ansible.builtin.template:
@@ -80,6 +81,7 @@
     owner: root
     group: root
   become: true
+  notify: "restart rke2-{{ rke2_type }}"
 
 - name: start and enable the systemd service
   ansible.builtin.systemd:
