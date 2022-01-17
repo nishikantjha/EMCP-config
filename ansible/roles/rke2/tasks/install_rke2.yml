@@ -96,3 +96,10 @@
   when: 
     - first_run_server is not defined
     - rke2_type == "server"
+
+- name: download kubeconfig to controller
+  ansible.builtin.fetch:
+    dest: "{{ rke2_download_kubeconf_path }}{{ inventory_hostname }}_rke2.yml"
+    src: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
+    flat: true
+  when: first_run_server == inventory_hostname

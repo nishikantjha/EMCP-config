@@ -3,7 +3,7 @@ token: {{ rke2_token }}
 server: https://{{ rke2_server_url }}:9345
 {% endif %}
 
-write-kubeconfig: {{ rke2_download_kubeconf_path }}/{{ rke2_download_kubeconf_file_name }}
+write-kubeconfig: {{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}
 write-kubeconfig-mode: "0644"
 tls-san: {{ rke2_additional_sans }}
 
