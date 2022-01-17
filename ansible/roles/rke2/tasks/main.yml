@@ -55,7 +55,7 @@
 
 - name: include longhorn install tasks
   block:
-    - include_tasks: install_longhorn.yml
+    - include_tasks: setup_longhorn.yml
   tags:
     - rke2
     - longhorn
