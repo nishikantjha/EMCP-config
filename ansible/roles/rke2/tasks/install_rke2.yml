@@ -97,9 +97,25 @@
     - first_run_server is not defined
     - rke2_type == "server"
 
+- name: change server reference in kubeconfig from localhost to actual url
+  ansible.builtin.replace:
+    path: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
+    regexp: '(\s+server: https://)127\.0\.0\.1(:6443)'
+    replace: '\g<1>{{ rke2_server_url }}\g<2>'
+  when: first_run_server == inventory_hostname
+  become: true
+
 - name: download kubeconfig to controller
   ansible.builtin.fetch:
     dest: "{{ rke2_download_kubeconf_path }}{{ inventory_hostname }}_rke2.yml"
     src: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     flat: true
   when: first_run_server == inventory_hostname
+
+- name: change mode of downloaded kubeconfig file
+  ansible.builtin.file:
+    path: "{{ rke2_download_kubeconf_path }}{{ inventory_hostname }}_rke2.yml"
+    mode: 0600
+    state: file
+  when: first_run_server == inventory_hostname
+  delegate_to: localhost
