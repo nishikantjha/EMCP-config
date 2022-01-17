@@ -46,6 +46,13 @@
     - rke2
     - install-rke2
 
+- name: include longhorn preparation tasks
+  block:
+    - include_tasks: prep_longhorn.yml
+  tags:
+    - rke2
+    - longhorn-prep
+
 - name: include longhorn install tasks
   block:
     - include_tasks: install_longhorn.yml
