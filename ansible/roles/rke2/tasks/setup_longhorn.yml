@@ -13,6 +13,26 @@
     name: kubernetes
   become: true
 
+- name: install helm apt repo key
+  ansible.builtin.apt_key:
+    url: https://baltocdn.com/helm/signing.asc
+    state: present
+  become: true
+
+- name: install helm apt repo
+  ansible.builtin.apt_repository:
+    repo: deb https://baltocdn.com/helm/stable/debian/ all main
+    update_cache: true
+    install_python_apt: true
+    state: present
+  become: true
+
+- name: install helm apt package
+  ansible.builtin.apt:
+    name: helm
+    state: present
+  become: true
+
 - name: install longhorn helm repo
   kubernetes.core.helm_repository:
     repo_name: longhorn
