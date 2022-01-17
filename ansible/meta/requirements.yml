@@ -7,3 +7,4 @@ collections:
   - community.general
   - freeipa.ansible_freeipa
   - community.docker
+  - kubernetes.core
