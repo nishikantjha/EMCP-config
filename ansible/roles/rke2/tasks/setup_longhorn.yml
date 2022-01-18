@@ -11,12 +11,14 @@
 - name: install python kubernetes client using pip
   ansible.builtin.pip:
     name: kubernetes
+  environment: "{{ proxy_env | default('') }}"
   become: true
 
 - name: install helm apt repo key
   ansible.builtin.apt_key:
     url: https://baltocdn.com/helm/signing.asc
     state: present
+  environment: "{{ proxy_env | default('') }}"
   become: true
 
 - name: install helm apt repo
@@ -33,11 +35,28 @@
     state: present
   become: true
 
+- name: ensure longhorn node labels and annotations
+  kubernetes.core.k8s:
+    kind: Node
+    name: "{{ rke2_item }}"
+    state: patched
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      metadata:
+        labels:
+          node.longhorn.io/create-default-disk: 'config'
+        annotations:
+          node.longhorn.io/default-disks-config: "{{ longhorn_nodes_disks_config }}"
+  loop: "{{ ansible_play_hosts }}"
+  loop_control:
+    loop_var: rke2_item
+
 - name: install longhorn helm repo
   kubernetes.core.helm_repository:
     repo_name: longhorn
     repo_url: https://charts.longhorn.io
     repo_state: present
+  environment: "{{ proxy_env | default('') }}"
   become: true
 
 - name: install longhorn chart
@@ -50,5 +69,7 @@
     values:
       createDefaultDiskLabeledNodes: true
     wait: true
+    create_namespace: true
     release_state: present
+  environment: "{{ proxy_env | default('') }}"
   become: true

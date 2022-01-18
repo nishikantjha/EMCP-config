@@ -51,6 +51,7 @@
     - include_tasks: prep_longhorn.yml
   tags:
     - rke2
+    - longhorn
     - longhorn-prep
 
 - name: include longhorn install tasks
