@@ -107,14 +107,14 @@
 
 - name: download kubeconfig to controller
   ansible.builtin.fetch:
-    dest: "{{ rke2_download_kubeconf_path }}{{ inventory_hostname }}_rke2.yml"
+    dest: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
     src: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     flat: true
   when: first_run_server == inventory_hostname
 
 - name: change mode of downloaded kubeconfig file
   ansible.builtin.file:
-    path: "{{ rke2_download_kubeconf_path }}{{ inventory_hostname }}_rke2.yml"
+    path: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
     mode: 0600
     state: file
   when: first_run_server == inventory_hostname
