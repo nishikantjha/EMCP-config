@@ -67,7 +67,8 @@
     chart_version: "{{ longhorn_chart_version }}"
     kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
     values:
-      createDefaultDiskLabeledNodes: true
+      defaultSettings:
+        createDefaultDiskLabeledNodes: true
     wait: true
     create_namespace: true
     release_state: present
