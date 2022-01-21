@@ -17,7 +17,7 @@
     wait: true
     create_namespace: true
     update_repo_cache: true
-    values_file: "{{ lookup('template', 'metallb_config.yml.j2') | from_yaml }}"
+    values: "{{ lookup('template', 'metallb_config.yml.j2') | from_yaml }}"
     release_state: present
   environment: "{{ proxy_env | default('') }}"
   become: true
