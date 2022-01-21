@@ -62,3 +62,12 @@
     - longhorn
   run_once: true
   delegate_to: localhost
+
+- name: include metallb install tasks
+  block:
+    - include_tasks: install_metallb.yml
+  tags:
+    - rke2
+    - metallb
+  run_once: true
+  delegate_to: localhost
