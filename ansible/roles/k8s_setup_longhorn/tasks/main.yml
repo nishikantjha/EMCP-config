@@ -1,0 +1,26 @@
+
+- name: include longhorn preparation tasks
+  block:
+    - include_tasks: prep.yml
+  tags:
+    - longhorn
+    - longhorn-prep
+
+- name: include longhorn install tasks
+  block:
+    - include_tasks: setup.yml
+  tags:
+    - longhorn
+    - longhorn-install
+  run_once: true
+  delegate_to: localhost
+
+- name: include IngressRoutes tasks
+  block:
+    - include_tasks: ingress.yml
+  tags:
+    - longhorn
+    - longhorn-ui-ingress
+  run_once: true
+  delegate_to: localhost
+  become: true

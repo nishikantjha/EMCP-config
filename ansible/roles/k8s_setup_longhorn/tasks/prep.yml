@@ -1,0 +1,46 @@
+
+- name: create /local directory
+  ansible.builtin.file:
+    path: /local
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+  tags:
+    - mount_local
+
+- name: partition all defined drives
+  community.general.parted:
+    device: "{{ rke2_item.device }}"
+    number: "{{ rke2_item.number }}"
+    label: "{{ rke2_item.label }}"
+    state: present
+  become: true
+  loop: "{{ longhorn_nodes_additional_storage_layout }}"
+  loop_control:
+    loop_var: rke2_item
+  tags:
+    - mount_local
+
+- name: format all defined drives
+  community.general.filesystem:
+    fstype: ext4
+    dev: "{{ rke2_item.device }}{{ rke2_item.number }}"
+  become: true
+  loop: "{{ longhorn_nodes_additional_storage_layout }}"
+  loop_control:
+    loop_var: rke2_item
+
+- name: mount drives to /local/
+  mount:
+    path: "/local/{{ rke2_item.name }}"
+    src: "{{ rke2_item.device }}{{ rke2_item.number }}"
+    fstype: ext4
+    state: mounted
+  become: true
+  loop: "{{ longhorn_nodes_additional_storage_layout }}"
+  loop_control:
+    loop_var: rke2_item
+  tags:
+    - mount_local
