@@ -1,0 +1,46 @@
+
+- name: add the traefik helm repo
+  kubernetes.core.helm_repository:
+    repo_name: traefik
+    repo_url: https://helm.traefik.io/traefik
+    repo_state: present
+  environment: "{{ proxy_env | default('') }}"
+
+- name: install traefik CRD definitions
+  kubernetes.core.k8s:
+    src: traefik_crd_definitions.yml
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    state: present
+  become: false
+
+- name: install traefik RBAC CRD
+  kubernetes.core.k8s:
+    src: traefik_crd_rbac.yml
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    state: present
+  become: false
+
+- name: create traefik service account
+  kubernetes.core.k8s:
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        namespace: traefik
+        name: "{{ traefik_service_account }}"
+    state: present
+
+- name: install traefik chart
+  kubernetes.core.helm:
+    release_name: traefik
+    release_namespace: traefik
+    chart_ref: traefik/traefik
+    chart_version: "{{ traefik_chart_version }}"
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    wait: true
+    create_namespace: true
+    update_repo_cache: true
+    values: "{{ lookup('template', 'traefik_helm_values.yml.j2') | from_yaml }}"
+    release_state: present
+  environment: "{{ proxy_env | default('') }}"
