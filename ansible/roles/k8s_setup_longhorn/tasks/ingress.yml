@@ -65,7 +65,7 @@
       apiVersion: traefik.containo.us/v1alpha1
       kind: IngressRoute
       metadata:
-        name: whoami
+        name: longhorn
         namespace: default
       spec:
         entrypoints: 
