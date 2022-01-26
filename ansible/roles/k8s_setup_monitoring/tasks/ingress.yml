@@ -1,0 +1,42 @@
+
+- name: build monitoring ingress routes
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: traefik.containo.us/v1alpha1
+      kind: IngressRoute
+      metadata:
+        name: influxdb
+        namespace: monitoring
+      spec:
+        entrypoints: 
+          - monitoring
+        routes:
+          - match: PathPrefix(`/`)
+            kind: Rule
+            services:
+              - name: "{{ influxdb_service_name }}"
+                namespace: monitoring
+                port: 8086
+
+- name: build monitoring ingress routes
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: traefik.containo.us/v1alpha1
+      kind: IngressRoute
+      metadata:
+        name: grafana
+        namespace: monitoring
+      spec:
+        entrypoints: 
+          - web
+        routes:
+          - match: "Host(`{{ grafana_host_header_to_match }}`)"
+            kind: Rule
+            services:
+              - name: "{{ grafana_service_name }}"
+                namespace: monitoring
+                port: 3000

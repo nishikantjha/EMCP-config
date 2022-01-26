@@ -1,0 +1,27 @@
+
+- name: include influxdb setup tasks
+  block:
+    - include_tasks: install_influxdb.yml
+  tags:
+    - monitoring
+    - influxdb
+  run_once: true
+  delegate_to: localhost
+
+- name: include influxdb setup tasks
+  block:
+    - include_tasks: install_grafana.yml
+  tags:
+    - monitoring
+    - grafana
+  run_once: true
+  delegate_to: localhost
+
+- name: include ingress setup tasks
+  block:
+    - include_tasks: ingress.yml
+  tags:
+    - monitoring
+    - monitoring-ingress
+  run_once: true
+  delegate_to: localhost
