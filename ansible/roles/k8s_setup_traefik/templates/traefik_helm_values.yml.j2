@@ -77,12 +77,12 @@ ports:
   web:
     port: 8000
     expose: true
-    exposedPort: 8080
+    exposedPort: 80
     protocol: TCP
   websecure:
     port: 8443
     expose: true
-    exposedPort: 9443
+    exposedPort: 443
     protocol: TCP
     tls:
       enabled: false
@@ -93,6 +93,11 @@ ports:
     port: 9100
     expose: false
     exposedPort: 9100
+    protocol: TCP
+  monitoring:
+    port: 8086
+    expose: true
+    exposedPort: 8086
     protocol: TCP
 tlsOptions: {}
 service:
