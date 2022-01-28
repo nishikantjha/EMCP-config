@@ -10,10 +10,10 @@
         name: influxdb
         namespace: monitoring
       spec:
-        entrypoints: 
+        entryPoints:
           - monitoring
         routes:
-          - match: PathPrefix(`/`)
+          - match: "PathPrefix(`/`) && !Host(`{{ grafana_host_header_to_match }}`)"
             kind: Rule
             services:
               - name: "{{ influxdb_service_name }}"
@@ -31,10 +31,10 @@
         name: grafana
         namespace: monitoring
       spec:
-        entrypoints: 
+        entryPoints:
           - web
         routes:
-          - match: "Host(`{{ grafana_host_header_to_match }}`)"
+          - match: "PathPrefix(`/`) && Host(`{{ grafana_host_header_to_match }}`)"
             kind: Rule
             services:
               - name: "{{ grafana_service_name }}"
