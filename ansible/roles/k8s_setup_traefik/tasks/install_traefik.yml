@@ -6,6 +6,14 @@
     repo_state: present
   environment: "{{ proxy_env | default('') }}"
 
+- name: ensure traefik namespace
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    api_version: v1
+    kind: Namespace
+    name: traefik
+
 - name: install traefik CRD definitions
   kubernetes.core.k8s:
     src: traefik_crd_definitions.yml
