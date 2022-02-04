@@ -1,0 +1,16 @@
+
+- name: create the pdns user and group
+  ansible.builtin.user:
+    name: "{{ pdns_user }}"
+    group: "{{ pdns_group }}"
+    system: true
+    state: present
+
+- name: include powerdns role
+  block:
+    - include_role: 
+        name: powerdns.pdns
+  tags:
+    - dns
+    - powerdns
+  become: true

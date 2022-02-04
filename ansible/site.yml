@@ -1,5 +1,12 @@
 ---
 
+- hosts: dns_servers
+  become: true
+  remote_user: ubuntu
+  gather_facts: true
+  roles:
+    - dns_servers
+
 - hosts: k8s
   become: true
   ignore_errors: true
