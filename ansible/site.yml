@@ -82,8 +82,8 @@
     - role: freeipa.ansible_freeipa.ipaclient
       state: present
       tags: freeIPA-client
+    - role: ipaclient_postinstall
     - role: subidmap
-    - role: ipaclient_deduplicate_groups
 
 
 - hosts: managed_cluster

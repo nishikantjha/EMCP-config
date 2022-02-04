@@ -10,3 +10,8 @@
   - include_tasks: docker_group_deduplicate.yml
   when: docker_group_exists
   tags: ipaclient-deduplicate-groups
+
+- name: Change the default umask for user homes created by the pam_mkhomedir module.
+  block:
+  - include_tasks: pam_mkhomedir_umask.yml
+  tags: ipaclient-homedir-permissions
