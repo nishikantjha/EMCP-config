@@ -5,7 +5,8 @@
   remote_user: ubuntu
   gather_facts: true
   roles:
-    - dns_servers
+    - docker
+    - dns_server
 
 - hosts: k8s
   become: true
