@@ -1,15 +1,74 @@
 
-- name: create the pdns user and group
+- name: install docker python bindings
+  ansible.builtin.apt:
+    name: python3-docker
+    state: present
+  tags:
+    - dns
+    - powerdns
+  become: true
+
+- name: create the pdns group
+  ansible.builtin.group:
+    name: "{{ pdns_group }}"
+    system: true
+    state: present
+  tags:
+    - dns
+    - powerdns
+  become: true
+
+- name: create the pdns user
   ansible.builtin.user:
     name: "{{ pdns_user }}"
     group: "{{ pdns_group }}"
     system: true
     state: present
+  tags:
+    - dns
+    - powerdns
+  become: true
 
-- name: include powerdns role
-  block:
-    - include_role: 
-        name: powerdns.pdns
+- name: create pdns data directory
+  ansible.builtin.file:
+    path: "{{ pdns_mount_host_path }}"
+    state: directory
+    mode: 0777
+    owner: "{{ pdns_user }}"
+    group: "{{ pdns_group }}"
+  tags:
+    - dns
+    - powerdns
+  become: true
+
+- name: disable systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: stopped
+    masked: true
+    enabled: false
+  tags:
+    - dns
+    - powerdns
+  become: true
+
+- name: launch pdns docker image
+  community.docker.docker_container:
+    auto_remove: false
+    detach: true
+    image: "{{ pdns_image }}:{{ pdns_image_tag }}"
+    volumes: 
+      - "{{ pdns_mount_host_path }}:/var/lib/powerdns"
+    name: "{{ pdns_container_name }}"
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8081:8081/tcp"
+    pull: true
+    restart_policy: unless-stopped
+    state: started
+    env:
+      PDNS_AUTH_API_KEY: "{{ pdns_auth_api_key | string }}"
   tags:
     - dns
     - powerdns
