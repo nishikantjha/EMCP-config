@@ -1,0 +1,7 @@
+---
+- name: If the pam_mkhomedir.so module is enabled, configure it to create home directories with umask 0027 rather than the default 0022
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/common-session
+    backrefs: true
+    regexp: '^session(.*)pam_mkhomedir.so$'
+    line: 'session\1pam_mkhomedir.so umask=0027'
