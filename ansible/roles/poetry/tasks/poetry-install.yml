@@ -15,12 +15,16 @@
   environment:
     POETRY_VERSION: "{{ poetry_version }}"
     POETRY_HOME: "{{ poetry_home }}"
+  vars:
+    already_installed_expr: "{{ ('version (' ~ poetry_version ~ ') is already installed.') | regex_escape() }}"
   ansible.builtin.command:
     argv:
       - python3
       - "{{ poetry_installation_script }}"
   async: 1800
   poll: 10
+  changed_when: not (poetry_installation_result['stdout'] | regex_search(already_installed_expr))
+  register: poetry_installation_result
 
 - name: Verify the installation
   become: false
