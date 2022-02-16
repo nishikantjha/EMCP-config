@@ -9,8 +9,8 @@
 
 - name: Copy the Poetry configuration file
   ansible.builtin.copy:
-    src: config.toml
-    dest: /etc/skel/.config/pypoetry/
+    src: poetry-config.toml
+    dest: /etc/skel/.config/pypoetry/config.toml
     owner: root
     group: root
     mode: 0644
