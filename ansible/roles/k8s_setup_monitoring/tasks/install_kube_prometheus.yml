@@ -1,0 +1,18 @@
+
+- name: install kube-prometheus setup-manifests
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    src: "{{ k8s_setup_monitoring_item }}"
+  loop: "{{ lookup('fileglob', 'manifests/setup/*.yaml', wantlist=true) }}"
+  loop_control:
+    loop_var: k8s_setup_monitoring_item
+
+- name: install kube-prometheus manifests
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    src: "{{ k8s_setup_monitoring_item }}"
+  loop: "{{ lookup('fileglob', 'manifests/*.yaml', wantlist=true) }}"
+  loop_control:
+    loop_var: k8s_setup_monitoring_item

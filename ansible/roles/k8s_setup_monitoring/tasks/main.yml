@@ -1,19 +1,28 @@
 
-- name: include influxdb setup tasks
-  block:
-    - include_tasks: install_influxdb.yml
-  tags:
-    - monitoring
-    - influxdb
-  run_once: true
-  delegate_to: localhost
+# - name: include influxdb setup tasks
+#   block:
+#     - include_tasks: install_influxdb.yml
+#   tags:
+#     - monitoring
+#     - influxdb
+#   run_once: true
+#   delegate_to: localhost
 
-- name: include influxdb setup tasks
+# - name: include influxdb setup tasks
+#   block:
+#     - include_tasks: install_grafana.yml
+#   tags:
+#     - monitoring
+#     - grafana
+#   run_once: true
+#   delegate_to: localhost
+
+- name: include kube-prometheus setup tasks
   block:
-    - include_tasks: install_grafana.yml
+    - include_tasks: install_kube_prometheus.yml
   tags:
     - monitoring
-    - grafana
+    - kube-prometheus
   run_once: true
   delegate_to: localhost
 
