@@ -14,3 +14,11 @@
   tags:
     - user-home-config
     - container-storage
+
+- name: Configure Poetry
+  become: true
+  block:
+    - include_tasks: poetry-config.yml
+  tags:
+    - user-home-config
+    - python-poetry-config

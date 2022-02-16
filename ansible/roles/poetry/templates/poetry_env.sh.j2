@@ -1,0 +1,2 @@
+# If PATH is already defined, append ":${PATH}" to Poetry's bin directory.
+export PATH="{{ poetry_home }}/bin${PATH:+:${PATH}}"
