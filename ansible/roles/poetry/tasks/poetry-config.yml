@@ -1,0 +1,17 @@
+---
+- name: Create the pypoetry directory if it doesn't exist
+  ansible.builtin.file:
+    path: /etc/skel/.config/pypoetry
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: Copy the Poetry configuration file
+  ansible.builtin.copy:
+    src: config.toml
+    dest: /etc/skel/.config/pypoetry/
+    owner: root
+    group: root
+    mode: 0644
+    force: true

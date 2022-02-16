@@ -50,6 +50,7 @@
     - nvidia
     - miniconda
     - g_node_devtools
+    - poetry
 
 
 - hosts: ipaserver

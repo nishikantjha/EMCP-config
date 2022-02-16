@@ -1,0 +1,12 @@
+---
+- name: Install Poetry
+  become: true
+  block:
+    - include_tasks: poetry-install.yml
+  tags: python-poetry
+
+- name: Add a configuration file in the skel directory
+  become: true
+  block:
+    - include_tasks: poetry-config.yml
+  tags: python-poetry

@@ -1,0 +1,46 @@
+---
+- name: Make sure the installation directory exists
+  ansible.builtin.file:
+    path: "{{ poetry_home }}"
+    state: directory
+    mode: 0755
+
+- name: Download the installation script
+  ansible.builtin.get_url:
+    url: https://install.python-poetry.org
+    dest: "{{ poetry_installation_script }}"
+    mode: 0755
+
+- name: Install Poetry at {{ poetry_home }} (max 30 minutes, poll every 10 seconds)
+  environment:
+    POETRY_VERSION: "{{ poetry_version }}"
+    POETRY_HOME: "{{ poetry_home }}"
+  ansible.builtin.command:
+    argv:
+      - python3
+      - "{{ poetry_installation_script }}"
+  async: 1800
+  poll: 10
+
+- name: Verify the installation
+  become: false
+  ansible.builtin.command:
+    argv:
+      - "{{ poetry_home }}/bin/poetry"
+      - --version
+  changed_when: false
+  register: poetry_verification_result
+
+- name: Add Poetry's bin directory to PATH
+  ansible.builtin.template:
+    src: "{{ poetry_env_filename }}.j2"
+    dest: "/etc/profile.d/{{ poetry_env_filename }}"
+    owner: root
+    group: root
+    mode: 0755
+    force: true
+  when: poetry_verification_result is success
+
+- name: Add Bash completions
+  ansible.builtin.shell: "{{ poetry_home | quote }}/bin/poetry completions bash > /etc/bash_completion.d/poetry.bash-completion"
+  when: poetry_verification_result is success
