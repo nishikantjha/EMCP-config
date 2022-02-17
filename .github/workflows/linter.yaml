@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Lint ansible project
-        uses: ansible/ansible-lint-action@v4.1
+        uses: ansible/ansible-lint-action@v4.1.0
         with:
           target: 'ansible/'
           args: '--parseable-severity --force-color -v'
