@@ -20,6 +20,6 @@ jobs:
       - name: Lint ansible project
         uses: ansible/ansible-lint-action@v4.1.0
         with:
-          target: 'ansible/'
+          targets: 'ansible/'
           args: '--parseable-severity --force-color -v'
 
