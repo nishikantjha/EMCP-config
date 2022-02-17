@@ -1,4 +1,3 @@
-
 - name: download the rke2 installation script
   ansible.builtin.get_url:
     url: "{{ rke2_install_script_url }}"
@@ -48,11 +47,13 @@
       - "-1"
   register: apiserver_curl
 
-- set_fact:
+- name: set current_server_is_not_first variable
+  ansible.builtin.set_fact:
     current_server_is_not_first: true
   when: apiserver_curl['status'] == 401
 
-- set_fact:
+- name: set current_server_is_not_first variable
+  ansible.builtin.set_fact:
     current_server_is_not_first: false
   when: apiserver_curl['status'] != 401
 
@@ -93,7 +94,7 @@
 - name: set the first_run_server variable
   ansible.builtin.set_fact:
     first_run_server: "{{ inventory_hostname }}"
-  when: 
+  when:
     - first_run_server is not defined
     - rke2_type == "server"
 

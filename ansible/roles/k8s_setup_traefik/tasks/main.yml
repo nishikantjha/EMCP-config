@@ -1,4 +1,3 @@
-
 - name: include metallb install tasks
   block:
     - include_tasks: install_metallb.yml

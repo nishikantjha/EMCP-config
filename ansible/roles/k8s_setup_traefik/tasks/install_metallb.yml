@@ -1,4 +1,3 @@
-
 - name: add the metallb helm repo
   kubernetes.core.helm_repository:
     repo_name: metallb
