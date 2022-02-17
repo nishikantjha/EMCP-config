@@ -1,4 +1,3 @@
-
 - name: install kube-prometheus setup-manifests
   kubernetes.core.k8s:
     state: present
