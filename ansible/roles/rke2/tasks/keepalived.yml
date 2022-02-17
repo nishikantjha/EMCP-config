@@ -1,4 +1,3 @@
-
 - name: install keepalived
   ansible.builtin.apt:
     name: keepalived
@@ -45,8 +44,8 @@
 - name: Enable keepalived and make sure it is not masked
   ansible.builtin.systemd:
     name: keepalived
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   become: true
   notify: restart keepalived
 

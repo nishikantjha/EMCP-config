@@ -1,4 +1,3 @@
-
 - name: install dependencies to use the pip module
   ansible.builtin.apt:
     name:
@@ -38,7 +37,7 @@
 - name: ensure longhorn node labels and annotations
   kubernetes.core.k8s:
     kind: Node
-    name: "{{ rke2_item }}"
+    name: "{{ k8s_setup_longhorn_item }}"
     state: patched
     kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
@@ -49,7 +48,7 @@
           node.longhorn.io/default-disks-config: "{{ longhorn_nodes_disks_config }}"
   loop: "{{ ansible_play_hosts }}"
   loop_control:
-    loop_var: rke2_item
+    loop_var: k8s_setup_longhorn_item
 
 - name: install longhorn helm repo
   kubernetes.core.helm_repository:

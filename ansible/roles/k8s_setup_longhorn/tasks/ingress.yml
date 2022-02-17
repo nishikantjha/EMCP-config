@@ -1,4 +1,3 @@
-
 - name: build svc-wss-headers middleware
   kubernetes.core.k8s:
     state: present
@@ -68,7 +67,7 @@
         name: longhorn
         namespace: default
       spec:
-        entrypoints: 
+        entrypoints:
           - web
         routes:
           - match: PathPrefix(`/longhorn`)
