@@ -16,10 +16,12 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Lint ansible project
-        uses: ansible/ansible-lint-action@v4.1.0
+        uses: hfrSchmidt/ansible-lint-github-action@v1
         with:
-          targets: 'ansible/'
+          project_dir: 'ansible'
+          config_file: '.ansible-lint.yml'
           args: '--parseable-severity --force-color -v'
-
