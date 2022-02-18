@@ -16,6 +16,9 @@
     - rke2
     - rke2-disable-swap
 
+# this sets up the primary master by taking the first host that is encountered in the inventory group
+# Potentially this could mean that different hosts are selected on subsequent runs
+# TODO this can be improved by introducing another inventory group with a single server inside
 - name: include rke2 install tasks
   block:
     - include_tasks: install_rke2.yml
