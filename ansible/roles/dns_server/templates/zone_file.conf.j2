@@ -1,5 +1,5 @@
 $ORIGIN {{ ikim_dns_zone }}.
-$TTL 3600
+$TTL {{ dns_ttl }}
 {{ ikim_dns_zone }}.   IN  SOA     ns.{{ ikim_dns_zone }}. {{ dns_admin_email_address }} (
                                 {{ dns_current_serial_number }}; Serial number YYYYMMDD++
                                 {{ dns_refresh_period }}; Refresh
