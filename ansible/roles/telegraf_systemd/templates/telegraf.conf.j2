@@ -1,0 +1,399 @@
+# Global tags can be specified here in key="value" format.
+[global_tags]
+  # dc = "us-east-1" # will tag all metrics with dc=us-east-1
+  # rack = "1a"
+  ## Environment variables can be used as tags, and throughout the config file
+  # user = "$USER"
+
+[agent]
+  interval = "10s"
+  round_interval = true
+  metric_batch_size = 1000
+  metric_buffer_limit = 10000
+  collection_jitter = "0s"
+  flush_interval = "10s"
+  flush_jitter = "0s"
+  precision = "0s"
+  logtarget = "file"
+  logfile = "/var/log/telegraf/telegraf.log"
+  logfile_rotation_max_size = "100MB"
+  logfile_rotation_max_archives = 5
+
+[[outputs.prometheus_client]]
+  listen = ":{{ metrics_listen_port }}"
+
+  ## Metric version controls the mapping from Telegraf metrics into
+  ## Prometheus format.  When using the prometheus input, use the same value in
+  ## both plugins to ensure metrics are round-tripped without modification.
+  ##
+  ##   example: metric_version = 1;
+  ##            metric_version = 2; recommended version
+  metric_version = 2
+
+  ## Use HTTP Basic Authentication.
+  # basic_username = "Foo"
+  # basic_password = "Bar"
+
+  ## If set, the IP Ranges which are allowed to access metrics.
+  ##   ex: ip_range = ["192.168.0.0/24", "192.168.1.0/30"]
+  # ip_range = []
+
+  ## Path to publish the metrics on.
+  path = "/metrics"
+
+  ## Expiration interval for each metric. 0 == no expiration
+  expiration_interval = "60s"
+
+  ## Collectors to enable, valid entries are "gocollector" and "process".
+  ## If unset, both are enabled.
+  # collectors_exclude = ["gocollector", "process"]
+
+  ## Send string metrics as Prometheus labels.
+  ## Unless set to false all string metrics will be sent as labels.
+  string_as_label = true
+
+  ## If set, enable TLS with the given certificate.
+  # tls_cert = "/etc/ssl/telegraf.crt"
+  # tls_key = "/etc/ssl/telegraf.key"
+
+  ## Set one or more allowed client CA certificate file names to
+  ## enable mutually authenticated TLS connections
+  # tls_allowed_cacerts = ["/etc/telegraf/clientca.pem"]
+
+  ## Export metric collection time.
+  export_timestamp = false
+
+###############################################################################
+#                            PROCESSOR PLUGINS                                #
+###############################################################################
+
+# # Filter metrics with repeating field values
+# [[processors.dedup]]
+#   ## Maximum time to suppress output
+#   dedup_interval = "600s"
+
+
+###############################################################################
+#                            INPUT PLUGINS                                    #
+###############################################################################
+
+# Read metrics about cpu usage
+[[inputs.cpu]]
+  percpu = true
+  totalcpu = true
+  collect_cpu_time = false
+  report_active = false
+
+[[inputs.disk]]
+  ## By default stats will be gathered for all mount points.
+  ## Set mount_points will restrict the stats to only the specified mount points.
+  # mount_points = ["/"]
+  ## Ignore mount points by filesystem type.
+  ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
+
+
+# Read metrics about disk IO by device
+[[inputs.diskio]]
+  ## By default, telegraf will gather stats for all devices including
+  ## disk partitions.
+  ## Setting devices will restrict the stats to the specified devices.
+  # devices = ["sda", "sdb", "vd*"]
+  ## Uncomment the following line if you need disk serial numbers.
+  # skip_serial_number = false
+  #
+  ## On systems which support it, device metadata can be added in the form of
+  ## tags.
+  ## Currently only Linux is supported via udev properties. You can view
+  ## available properties for a device by running:
+  ## 'udevadm info -q property -n /dev/sda'
+  ## Note: Most, but not all, udev properties can be accessed this way. Properties
+  ## that are currently inaccessible include DEVTYPE, DEVNAME, and DEVPATH.
+  # device_tags = ["ID_FS_TYPE", "ID_FS_USAGE"]
+  #
+  ## Using the same metadata source as device_tags, you can also customize the
+  ## name of the device via templates.
+  ## The 'name_templates' parameter is a list of templates to try and apply to
+  ## the device. The template may contain variables in the form of '$PROPERTY' or
+  ## '${PROPERTY}'. The first template which does not contain any variables not
+  ## present for the device is used as the device name tag.
+  ## The typical use case is for LVM volumes, to get the VG/LV name instead of
+  ## the near-meaningless DM-0 name.
+  # name_templates = ["$ID_FS_LABEL","$DM_VG_NAME/$DM_LV_NAME"]
+
+
+# Get kernel statistics from /proc/stat
+[[inputs.kernel]]
+  # no configuration
+
+
+# Read metrics about memory usage
+[[inputs.mem]]
+  # no configuration
+
+
+# Get the number of processes and group them by status
+[[inputs.processes]]
+  # no configuration
+
+
+# Read metrics about swap memory usage
+[[inputs.swap]]
+  # no configuration
+
+
+# Read metrics about system load & uptime
+[[inputs.system]]
+  ## Uncomment to remove deprecated metrics.
+  # fielddrop = ["uptime_format"]
+
+{% if inventory_hostname in groups['bastion_hosts'] %}
+# # Read metrics from fail2ban.
+[[inputs.fail2ban]]
+#   ## Use sudo to run fail2ban-client
+#   use_sudo = false
+{% endif %}
+
+# # Read metrics from the Kubernetes api
+# [[inputs.kube_inventory]]
+#   ## URL for the Kubernetes API
+#   url = "https://127.0.0.1"
+#
+#   ## Namespace to use. Set to "" to use all namespaces.
+#   # namespace = "default"
+#
+#   ## Use bearer token for authorization. ('bearer_token' takes priority)
+#   ## If both of these are empty, we'll use the default serviceaccount:
+#   ## at: /run/secrets/kubernetes.io/serviceaccount/token
+#   # bearer_token = "/path/to/bearer/token"
+#   ## OR
+#   # bearer_token_string = "abc_123"
+#
+#   ## Set response_timeout (default 5 seconds)
+#   # response_timeout = "5s"
+#
+#   ## Optional Resources to exclude from gathering
+#   ## Leave them with blank with try to gather everything available.
+#   ## Values can be - "daemonsets", deployments", "endpoints", "ingress", "nodes",
+#   ## "persistentvolumes", "persistentvolumeclaims", "pods", "services", "statefulsets"
+#   # resource_exclude = [ "deployments", "nodes", "statefulsets" ]
+#
+#   ## Optional Resources to include when gathering
+#   ## Overrides resource_exclude if both set.
+#   # resource_include = [ "deployments", "nodes", "statefulsets" ]
+#
+#   ## selectors to include and exclude as tags.  Globs accepted.
+#   ## Note that an empty array for both will include all selectors as tags
+#   ## selector_exclude overrides selector_include if both set.
+#   # selector_include = []
+#   # selector_exclude = ["*"]
+#
+#   ## Optional TLS Config
+#   # tls_ca = "/path/to/cafile"
+#   # tls_cert = "/path/to/certfile"
+#   # tls_key = "/path/to/keyfile"
+#   # tls_server_name = "kubernetes.example.com"
+#   ## Use TLS but skip chain & host verification
+#   # insecure_skip_verify = false
+
+# # Provides Linux sysctl fs metrics
+[[inputs.linux_sysctl_fs]]
+#   # no configuration
+
+# # Read metrics about network interface usage
+[[inputs.net]]
+#   ## By default, telegraf gathers stats from any up interface (excluding loopback)
+#   ## Setting interfaces will tell it to gather these explicit interfaces,
+#   ## regardless of status.
+#   ##
+#   # interfaces = ["eth0"]
+#   ##
+#   ## On linux systems telegraf also collects protocol stats.
+#   ## Setting ignore_protocol_stats to true will skip reporting of protocol metrics.
+#   ##
+#   # ignore_protocol_stats = false
+#   ##
+
+# # Get standard NTP query metrics, requires ntpq executable.
+# [[inputs.ntpq]]
+#   ## If false, set the -n ntpq flag. Can reduce metric gather time.
+#   dns_lookup = true
+
+{% if inventory_hostname in groups['gpucluster'] %}
+# # Pulls statistics from nvidia GPUs attached to the host
+[[inputs.nvidia_smi]]
+#   ## Optional: path to nvidia-smi binary, defaults "/usr/bin/nvidia-smi"
+#   ## We will first try to locate the nvidia-smi binary with the explicitly specified value (or default value),
+#   ## if it is not found, we will try to locate it on PATH(exec.LookPath), if it is still not found, an error will be returned
+#   # bin_path = "/usr/bin/nvidia-smi"
+#
+#   ## Optional: timeout for GPU polling
+#   # timeout = "5s"
+{% endif %}
+
+{% if inventory_hostname in groups['bastion_hosts'] %}
+[[inputs.ping]]
+  urls = ["{{ external_connectivity_test_url }}"]
+  count = 3
+  ping_interval = 30.0
+  timeout = 1.0
+  interface = "{{ external_interface_bastion_hosts }}"
+{% endif %}
+
+
+# # Ping given url(s) and return statistics
+# [[inputs.ping]]
+#   ## Hosts to send ping packets to.
+#   urls = ["example.org"]
+#
+#   ## Method used for sending pings, can be either "exec" or "native".  When set
+#   ## to "exec" the systems ping command will be executed.  When set to "native"
+#   ## the plugin will send pings directly.
+#   ##
+#   ## While the default is "exec" for backwards compatibility, new deployments
+#   ## are encouraged to use the "native" method for improved compatibility and
+#   ## performance.
+#   # method = "exec"
+#
+#   ## Number of ping packets to send per interval.  Corresponds to the "-c"
+#   ## option of the ping command.
+#   # count = 1
+#
+#   ## Time to wait between sending ping packets in seconds.  Operates like the
+#   ## "-i" option of the ping command.
+#   # ping_interval = 1.0
+#
+#   ## If set, the time to wait for a ping response in seconds.  Operates like
+#   ## the "-W" option of the ping command.
+#   # timeout = 1.0
+#
+#   ## If set, the total ping deadline, in seconds.  Operates like the -w option
+#   ## of the ping command.
+#   # deadline = 10
+#
+#   ## Interface or source address to send ping from.  Operates like the -I or -S
+#   ## option of the ping command.
+#   # interface = ""
+#
+#   ## Percentiles to calculate. This only works with the native method.
+#   # percentiles = [50, 95, 99]
+#
+#   ## Specify the ping executable binary.
+#   # binary = "ping"
+#
+#   ## Arguments for ping command. When arguments is not empty, the command from
+#   ## the binary option will be used and other options (ping_interval, timeout,
+#   ## etc) will be ignored.
+#   # arguments = ["-c", "3"]
+#
+#   ## Use only IPv6 addresses when resolving a hostname.
+#   # ipv6 = false
+#
+#   ## Number of data bytes to be sent. Corresponds to the "-s"
+#   ## option of the ping command. This only works with the native method.
+#   # size = 56
+
+# # Read metrics from one or many PowerDNS servers
+# [[inputs.powerdns]]
+#   ## An array of sockets to gather stats about.
+#   ## Specify a path to unix socket.
+#   unix_sockets = ["/var/run/pdns.controlsocket"]
+
+
+# # Read metrics from one or many PowerDNS Recursor servers
+# [[inputs.powerdns_recursor]]
+#   ## Path to the Recursor control socket.
+#   unix_sockets = ["/var/run/pdns_recursor.controlsocket"]
+#
+#   ## Directory to create receive socket.  This default is likely not writable,
+#   ## please reference the full plugin documentation for a recommended setup.
+#   # socket_dir = "/var/run/"
+#   ## Socket permissions for the receive socket.
+#   # socket_mode = "0666"
+
+
+# # Read metrics from storage devices supporting S.M.A.R.T.
+[[inputs.smart]]
+#   ## Optionally specify the path to the smartctl executable
+#   # path_smartctl = "/usr/bin/smartctl"
+#
+#   ## Optionally specify the path to the nvme-cli executable
+#   # path_nvme = "/usr/bin/nvme"
+#
+#   ## Optionally specify if vendor specific attributes should be propagated for NVMe disk case
+#   ## ["auto-on"] - automatically find and enable additional vendor specific disk info
+#   ## ["vendor1", "vendor2", ...] - e.g. "Intel" enable additional Intel specific disk info
+#   # enable_extensions = ["auto-on"]
+#
+#   ## On most platforms used cli utilities requires root access.
+#   ## Setting 'use_sudo' to true will make use of sudo to run smartctl or nvme-cli.
+#   ## Sudo must be configured to allow the telegraf user to run smartctl or nvme-cli
+#   ## without a password.
+#   # use_sudo = false
+#
+#   ## Skip checking disks in this power mode. Defaults to
+#   ## "standby" to not wake up disks that have stopped rotating.
+#   ## See --nocheck in the man pages for smartctl.
+#   ## smartctl version 5.41 and 5.42 have faulty detection of
+#   ## power mode and might require changing this value to
+#   ## "never" depending on your disks.
+#   # nocheck = "standby"
+#
+#   ## Gather all returned S.M.A.R.T. attribute metrics and the detailed
+#   ## information from each drive into the 'smart_attribute' measurement.
+#   # attributes = false
+#
+#   ## Optionally specify devices to exclude from reporting if disks auto-discovery is performed.
+#   # excludes = [ "/dev/pass6" ]
+#
+#   ## Optionally specify devices and device type, if unset
+#   ## a scan (smartctl --scan and smartctl --scan -d nvme) for S.M.A.R.T. devices will be done
+#   ## and all found will be included except for the excluded in excludes.
+#   # devices = [ "/dev/ada0 -d atacam", "/dev/nvme0"]
+#
+#   ## Timeout for the cli command to complete.
+#   # timeout = "30s"
+#
+#   ## Optionally call smartctl and nvme-cli with a specific concurrency policy.
+#   ## By default, smartctl and nvme-cli are called in separate threads (goroutines) to gather disk attributes.
+#   ## Some devices (e.g. disks in RAID arrays) may have access limitations that require sequential reading of
+#   ## SMART data - one individual array drive at the time. In such case please set this configuration option
+#   ## to "sequential" to get readings for all drives.
+#   ## valid options: concurrent, sequential
+#   # read_method = "concurrent"
+
+
+# # Gather systemd units state
+# [[inputs.systemd_units]]
+#   ## Set timeout for systemctl execution
+#   # timeout = "1s"
+#   #
+#   ## Filter for a specific unit type, default is "service", other possible
+#   ## values are "socket", "target", "device", "mount", "automount", "swap",
+#   ## "timer", "path", "slice" and "scope ":
+#   # unittype = "service"
+#   #
+#   ## Filter for a specific pattern, default is "" (i.e. all), other possible
+#   ## values are valid pattern for systemctl, e.g. "a*" for all units with
+#   ## names starting with "a"
+#   # pattern = ""
+#   ## pattern = "telegraf* influxdb*"
+#   ## pattern = "a*"
+
+{% if inventory_hostname in groups['server'] %}
+# # Read metrics of ZFS from arcstats, zfetchstats, vdev_cache_stats, pools and datasets
+[[inputs.zfs]]
+#   ## ZFS kstat path. Ignored on FreeBSD
+#   ## If not specified, then default is:
+#   # kstatPath = "/proc/spl/kstat/zfs"
+#
+#   ## By default, telegraf gather all zfs stats
+#   ## If not specified, then default is:
+#   # kstatMetrics = ["arcstats", "zfetchstats", "vdev_cache_stats"]
+#   ## For Linux, the default is:
+#   # kstatMetrics = ["abdstats", "arcstats", "dnodestats", "dbufcachestats",
+#   #   "dmu_tx", "fm", "vdev_mirror_stats", "zfetchstats", "zil"]
+#   ## By default, don't gather zpool stats
+  poolMetrics = true
+#   ## By default, don't gather zdataset stats
+#   # datasetMetrics = false
+{% endif %}

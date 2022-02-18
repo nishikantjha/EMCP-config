@@ -1,0 +1,16 @@
+
+- name: include telegraf setup tasks
+  block:
+    - include_tasks: install_telegraf.yml
+  tags:
+    - monitoring-agent
+    - telegraf
+  become: true
+
+- name: include telegraf config tasks
+  block:
+    - include_tasks: configure_telegraf.yml
+  tags:
+    - monitoring-agent
+    - telegraf
+  become: true
