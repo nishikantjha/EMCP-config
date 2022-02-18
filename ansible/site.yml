@@ -10,7 +10,6 @@
   environment: "{{ k8s_env | default({}) }}"
   roles:
     - update
-    - docker
     - security
 
 
@@ -134,3 +133,19 @@
   roles:
     - seafile
     - user_skel
+
+- hosts: rke_k8s_cluster
+  gather_facts: true
+  remote_user: ubuntu
+  roles:
+    - proxies
+    - set_default_gw
+    - rke2
+    - k8s_setup_longhorn
+
+- hosts: rke_masters
+  gather_facts: true
+  remote_user: ubuntu
+  roles:
+    - k8s_setup_traefik
+    - k8s_setup_monitoring

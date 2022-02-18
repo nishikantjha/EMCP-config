@@ -20,9 +20,8 @@ jobs:
           fetch-depth: 0
 
       - name: Lint ansible project
-        uses: hfrSchmidt/ansible-lint-github-action@v0.2.3
+        uses: hfrSchmidt/ansible-lint-github-action@v1.0.1
         with:
           project_dir: 'ansible'
           config_file: '.ansible-lint.yml'
           args: '--parseable-severity --force-color -v'
-

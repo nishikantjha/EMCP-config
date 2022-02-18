@@ -1,0 +1,32 @@
+- name: set temporary variable to find the current main interface
+  ansible.builtin.set_fact:
+    temp_dict: "{{ lookup('vars', 'ansible_' + set_default_gw_item)['ipv4']['network'] }}"
+  loop: "{{ ansible_interfaces }}"
+  loop_control:
+    loop_var: set_default_gw_item
+  when:
+    - lookup('vars', 'ansible_' + set_default_gw_item)['active']
+    - '"flannel" not in set_default_gw_item'
+    - '"cali" not in set_default_gw_item'
+    - lookup('vars', 'ansible_' + set_default_gw_item)['ipv4']['network'] == main_network
+  register: test_var
+
+- name: set the main interface variable
+  ansible.builtin.set_fact:
+    main_interface: "{{ test_var['results'] | selectattr('skipped', 'undefined') | first | community.general.json_query('item') }}"
+
+- name: retrieve cloud-init information
+  community.general.cloud_init_data_facts:
+  register: cloud_init_res
+  become: true
+
+- name: write netplan default gw config
+  ansible.builtin.template:
+    src: 60-default-gw.yml.j2
+    dest: /etc/netplan/60-default-gw.yaml
+    owner: root
+    group: root
+    mode: 0644
+  when: cloud_init_res['cloud_init_data_facts']['status']['v1']['stage'] is defined
+  become: true
+  notify: apply netplan config

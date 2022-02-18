@@ -1,0 +1,19 @@
+token: {{ rke2_token }}
+{% if current_server_is_not_first %}
+server: https://{{ rke2_server_url }}:9345
+{% endif %}
+
+write-kubeconfig: {{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}
+write-kubeconfig-mode: "0644"
+tls-san: {{ rke2_additional_sans }}
+
+cluster-domain: "cluster.local"
+
+etcd-snapshot-schedule-cron: "* */12 * * *"
+etcd-snapshot-retention: 6
+
+node-name: {{ inventory_hostname }}
+
+snapshotter: {{ rke2_snapshotter }}
+
+cni: {{ rke2_cni }}

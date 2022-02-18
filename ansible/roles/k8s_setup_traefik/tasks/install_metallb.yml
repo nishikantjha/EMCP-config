@@ -1,0 +1,22 @@
+- name: add the metallb helm repo
+  kubernetes.core.helm_repository:
+    repo_name: metallb
+    repo_url: https://metallb.github.io/metallb
+    repo_state: present
+  environment: "{{ proxy_env | default('') }}"
+  become: true
+
+- name: install metallb chart
+  kubernetes.core.helm:
+    release_name: metallb
+    release_namespace: metallb
+    chart_ref: metallb/metallb
+    chart_version: "{{ metallb_chart_version }}"
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    wait: true
+    create_namespace: true
+    update_repo_cache: true
+    values: "{{ lookup('template', 'metallb_config.yml.j2') | from_yaml }}"
+    release_state: present
+  environment: "{{ proxy_env | default('') }}"
+  become: true

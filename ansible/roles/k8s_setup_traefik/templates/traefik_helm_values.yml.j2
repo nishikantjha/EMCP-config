@@ -1,0 +1,145 @@
+
+image:
+  name: traefik
+  tag: "{{ traefik_image_tag }}"
+  pullPolicy: IfNotPresent
+deployment:
+  enabled: true
+  kind: Deployment
+  replicas: 1
+  terminationGracePeriodSeconds: 60
+  minReadySeconds: 0
+  annotations: {}
+  labels: {}
+  podAnnotations: {}
+  podLabels: {}
+  additionalContainers: []
+  additionalVolumes: []
+  initContainers: []
+  imagePullSecrets: []
+podDisruptionBudget:
+  enabled: false
+ingressClass:
+  enabled: false
+  isDefaultClass: false
+  fallbackApiVersion: ""
+pilot:
+  enabled: false
+  token: ""
+experimental:
+  plugins:
+    enabled: false
+  kubernetesGateway:
+    enabled: false
+    appLabelSelector: "traefik"
+    certificates: []
+ingressRoute:
+  dashboard:
+    enabled: true
+    annotations: {}
+    labels: {}
+rollingUpdate:
+  maxUnavailable: 1
+  maxSurge: 1
+providers:
+  kubernetesCRD:
+    enabled: true
+    allowCrossNamespace: true
+    allowExternalNameServices: false
+    namespaces:
+      - "default"
+      - "monitoring"
+      - "longhorn-system"
+  kubernetesIngress:
+    enabled: false
+volumes: []
+additionalVolumeMounts: []
+logs:
+  general:
+    level: ERROR
+  access:
+    enabled: false
+metrics:
+  prometheus:
+    entryPoint: metrics
+globalArguments:
+  - "--global.checknewversion"
+  - "--global.sendanonymoususage"
+additionalArguments: []
+env: []
+envFrom: []
+ports:
+  traefik:
+    port: 9000
+    expose: false
+    exposedPort: 9000
+    protocol: TCP
+  web:
+    port: 8000
+    expose: true
+    exposedPort: 80
+    protocol: TCP
+  websecure:
+    port: 8443
+    expose: true
+    exposedPort: 443
+    protocol: TCP
+    tls:
+      enabled: false
+      options: ""
+      certResolver: ""
+      domains: []
+  metrics:
+    port: 9100
+    expose: false
+    exposedPort: 9100
+    protocol: TCP
+  monitoring:
+    port: 8086
+    expose: true
+    exposedPort: 8086
+    protocol: TCP
+tlsOptions: {}
+service:
+  enabled: true
+  type: LoadBalancer
+  annotations: {}
+  annotationsTCP: {}
+  annotationsUDP: {}
+  labels: {}
+  spec: 
+    loadBalancerIP: "{{ traefik_lb_ip }}"
+  loadBalancerSourceRanges: []
+  externalIPs: []
+autoscaling:
+  enabled: false
+persistence:
+  enabled: true
+  name: data
+  accessMode: ReadWriteOnce
+  size: 128Mi
+  path: /data
+  annotations: {}
+hostNetwork: false
+rbac:
+  enabled: true
+  namespaced: false
+podSecurityPolicy:
+  enabled: false
+serviceAccount:
+  name: "{{ traefik_service_account }}"
+serviceAccountAnnotations: {}
+resources: {}
+affinity: {}
+nodeSelector: {}
+tolerations: []
+priorityClassName: ""
+securityContext:
+  capabilities:
+    drop: [ALL]
+  readOnlyRootFilesystem: true
+  runAsGroup: 65532
+  runAsNonRoot: true
+  runAsUser: 65532
+podSecurityContext:
+  fsGroup: 65532

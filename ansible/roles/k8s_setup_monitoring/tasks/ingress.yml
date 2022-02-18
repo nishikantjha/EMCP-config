@@ -1,0 +1,59 @@
+- name: create monitoring auth secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: monitoring-auth-secret
+        namespace: monitoring
+      data:
+        users: "{{ monitoring_http_auth_pass }}"
+
+- name: basic auth monitoring middleware
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: traefik.containo.us/v1alpha1
+      kind: Middleware
+      metadata:
+        name: auth-monitoring
+        namespace: monitoring
+      spec:
+        basicAuth:
+          secret: monitoring-auth-secret
+
+- name: build monitoring ingress routes
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: traefik.containo.us/v1alpha1
+      kind: IngressRoute
+      metadata:
+        name: monitoring
+        namespace: monitoring
+      spec:
+        entryPoints:
+          - web
+        routes:
+          - match: "PathPrefix(`/`) && Host(`{{ grafana_host_header_to_match }}`)"
+            kind: Rule
+            services:
+              - name: "{{ grafana_service_name }}"
+                namespace: monitoring
+                port: 3000
+          - match: "PathPrefix(`/`) && Host(`{{ prometheus_host_header_to_match }}`)"
+            kind: Rule
+            services:
+              - name: "{{ prometheus_service_name }}"
+                namespace: monitoring
+                port: web
+          - match: "PathPrefix(`/`) && Host(`{{ alertmanager_host_header_to_match }}`)"
+            kind: Rule
+            services:
+              - name: "{{ alertmanager_service_name }}"
+                namespace: monitoring
+                port: web

@@ -1,0 +1,49 @@
+- name: include keepalived tasks
+  block:
+    - include_tasks: keepalived.yml
+  tags:
+    - rke2
+    - rke2-keepalived
+  when:
+    - rke2_api_ip is defined
+    - inventory_hostname in groups[rke2_servers_group_name]
+    - rke2_ha_mode
+
+- name: include disable swap tasks
+  block:
+    - include_tasks: disable_swap.yml
+  tags:
+    - rke2
+    - rke2-disable-swap
+
+# this sets up the primary master by taking the first host that is encountered in the inventory group
+# Potentially this could mean that different hosts are selected on subsequent runs
+# TODO this can be improved by introducing another inventory group with a single server inside
+- name: include rke2 install tasks
+  block:
+    - include_tasks: install_rke2.yml
+  tags:
+    - rke2
+    - install-rke2
+  run_once: true
+
+- name: wait for api server to become available
+  ansible.builtin.uri:
+    url: "https://{{ rke2_server_url }}:{{ rke2_apiserver_dest_port }}"
+    method: GET
+    return_content: false
+    use_proxy: false
+    validate_certs: false
+    status_code:
+      - 401
+  register: apiserver_query_response
+  until: apiserver_query_response['status'] == 401
+  retries: 50
+  delay: 15
+
+- name: include rke2 install tasks
+  block:
+    - include_tasks: install_rke2.yml
+  tags:
+    - rke2
+    - install-rke2
