@@ -10,7 +10,6 @@
   environment: "{{ k8s_env | default({}) }}"
   roles:
     - update
-    - docker
     - security
 
 
