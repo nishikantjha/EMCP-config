@@ -185,7 +185,7 @@ function(params) {
       securityContext: {
         allowPrivilegeEscalation: false,
         readOnlyRootFilesystem: true,
-        capabilities: { drop: ['ALL'], add: ['CAP_SYS_TIME'] },
+        capabilities: { drop: ['ALL'], add: ['SYS_TIME'] },
       },
     };
 
@@ -249,6 +249,7 @@ function(params) {
             ],
             automountServiceAccountToken: true,
             serviceAccountName: ne._config.name,
+            priorityClassName: 'system-cluster-critical',
             securityContext: {
               runAsUser: 65534,
               runAsNonRoot: true,

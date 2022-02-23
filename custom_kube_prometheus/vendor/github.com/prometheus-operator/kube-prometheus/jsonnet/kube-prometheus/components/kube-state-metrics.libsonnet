@@ -20,6 +20,12 @@ local defaults = {
       requests+: { cpu: '20m' },
     },
   },
+  kubeRbacProxySelf:: {
+    resources+: {
+      limits+: { cpu: '20m' },
+      requests+: { cpu: '10m' },
+    },
+  },
   scrapeInterval:: '30s',
   scrapeTimeout:: '30s',
   commonLabels:: {
@@ -108,7 +114,7 @@ function(params) (import 'github.com/kubernetes/kube-state-metrics/jsonnet/kube-
     image: ksm._config.kubeRbacProxyImage,
   }),
 
-  local kubeRbacProxySelf = krp({
+  local kubeRbacProxySelf = krp(ksm._config.kubeRbacProxySelf {
     name: 'kube-rbac-proxy-self',
     upstream: 'http://127.0.0.1:8082/',
     secureListenAddress: ':9443',
@@ -118,8 +124,6 @@ function(params) (import 'github.com/kubernetes/kube-state-metrics/jsonnet/kube-
     image: ksm._config.kubeRbacProxyImage,
   }),
 
-  // FIXME(ArthurSens): The securityContext overrides can be removed after some PRs get merged
-  // 'capabilities: { drop: ['ALL'] },' can be deleted when https://github.com/kubernetes/kube-state-metrics/pull/1674 gets merged.
   deployment+: {
     spec+: {
       template+: {
@@ -136,9 +140,6 @@ function(params) (import 'github.com/kubernetes/kube-state-metrics/jsonnet/kube-
             readinessProbe:: null,
             args: ['--host=127.0.0.1', '--port=8081', '--telemetry-host=127.0.0.1', '--telemetry-port=8082'],
             resources: ksm._config.resources,
-            securityContext+: {
-              capabilities: { drop: ['ALL'] },
-            },
           }, super.containers) + [kubeRbacProxyMain, kubeRbacProxySelf],
         },
       },
