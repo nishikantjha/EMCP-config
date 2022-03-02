@@ -66,10 +66,15 @@
   tags:
     - autofs
 
+# The ipa-client-automount command uses the exit code 3 to indicate that no action is needed
 - name: configure ipa automount
-  shell: ipa-client-automount -U
+  command: ipa-client-automount -U
   become: true
-  changed_when: false
+  changed_when: cmd_automount['rc'] != 3
+  failed_when:
+    - cmd_automount['rc'] != 0
+    - cmd_automount['rc'] != 3
+  register: cmd_automount
   tags:
     - autofs
   notify:
