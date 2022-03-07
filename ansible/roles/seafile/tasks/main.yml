@@ -1,4 +1,9 @@
 ---
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name: ca-certificates
+    state: present
+
 - name: Add the signing key
   ansible.builtin.apt_key:
     url: https://linux-clients.seafile.com/seafile.asc
