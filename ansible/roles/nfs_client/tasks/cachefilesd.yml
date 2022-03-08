@@ -1,0 +1,30 @@
+- name: install cachefilesd
+  ansible.builtin.apt:
+    name: cachefilesd
+    state: present
+
+# use 2nd disk instead of system disk?
+# might require either symlinking or other shenanigans
+- name: config for cachefilesd
+  ansible.builtin.copy:
+    dest: /etc/cachefilesd.conf
+    content: |
+      # BEGIN ANSIBLE MANAGED BLOCK
+      dir /local/cache/fscache
+      secctx cachefiles_kernel_t
+      brun 10%
+      bcull 7%
+      bstop 3%
+      #secctx system_u:system_r:cachefiles_kernel_t:s0
+      # END ANSIBLE MANAGED BLOCK
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart cachefilesd
+
+- name: enable cachefilesd
+  ansible.builtin.lineinfile:
+    path: /etc/default/cachefilesd
+    regexp: '#RUN=yes'
+    line: 'RUN=yes'
+  notify: restart cachefilesd

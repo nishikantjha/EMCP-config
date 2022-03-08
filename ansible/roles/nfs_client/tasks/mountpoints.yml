@@ -1,0 +1,23 @@
+---
+- name: Make sure that the mountpoint root exist
+  ansible.builtin.file:
+    path: "{{ autofs_root }}"
+    state: directory
+
+- name: Copy the map file
+  ansible.builtin.template:
+    src: auto.nfs.j2
+    dest: /etc/auto.nfs
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload autofs
+
+- name: Copy the autofs file
+  ansible.builtin.template:
+    src: nfs.autofs.j2
+    dest: /etc/auto.master.d/nfs.autofs
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload autofs

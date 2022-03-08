@@ -1,0 +1,13 @@
+---
+- name: Install the NFS client and autofs
+  ansible.builtin.apt:
+    name:
+      - nfs-common
+      - autofs
+    state: present
+
+- name: Make sure autofs is running
+  ansible.builtin.systemd:
+    name: autofs
+    enabled: true
+    state: started
