@@ -37,12 +37,12 @@
 #     - include_tasks: create_automountmaps.yml
 #   run_once: true
 #   loop:
-#     - homes
-#     - projects
-#     - groups
-#     - software
+#     - {{ name: 'homes', cached: true }}
+#     - {{ name: 'projects', cached: true }}
+#     - {{ name: 'groups', cached: true }}
+#     - {{ name: 'software', cached: false }}
 #   loop_control:
-#     loop_var: mapname
+#     loop_var: mountmap
 #   tags:
 #     - ipa-automountmaps
 #     - ipa-settings
