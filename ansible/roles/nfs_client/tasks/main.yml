@@ -1,0 +1,26 @@
+---
+- name: Install autofs
+  become: true
+  block:
+    - include_tasks: install_autofs.yml
+  tags: nfs-client
+
+- name: Set up mountpoints
+  become: true
+  block:
+    - include_tasks: mountpoints.yml
+  when: (autofs_mounts | length) > 0
+  tags: nfs-client
+
+- name: Set up ipa automounts
+  become: true
+  block:
+    - include_tasks: ipa_automount.yml
+  when: ipa_automounts_enabled
+  tags: nfs-client
+
+- name: Configure cachefilesd
+  become: true
+  block:
+    - include_tasks: cachefilesd.yml
+  tags: nfs-client

@@ -1,0 +1,30 @@
+- name: install cachefilesd
+  ansible.builtin.apt:
+    name: cachefilesd
+    state: present
+
+- name: Make sure the cachefilesd service is running
+  ansible.builtin.systemd:
+    name: cachefilesd
+    enabled: true
+    state: started
+
+- name: Copy the configuration file
+  ansible.builtin.template:
+    src: cachefilesd.conf.j2
+    dest: /etc/cachefilesd.conf
+    owner: root
+    group: root
+    mode: 0644
+  when: cachefilesd_enabled
+  notify: restart cachefilesd
+
+- name: Enable cachefilesd
+  ansible.builtin.lineinfile:
+    path: /etc/default/cachefilesd
+    regexp: '^#?RUN='
+    line: "RUN={{ 'yes' if cachefilesd_enabled else 'no' }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart cachefilesd

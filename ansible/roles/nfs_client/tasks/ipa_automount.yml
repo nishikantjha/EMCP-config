@@ -1,0 +1,17 @@
+# per https://help.ubuntu.com/community/AutofsLDAP
+- name: install prerequisites
+  ansible.builtin.apt:
+    name:
+      - autofs-ldap
+      - ldap-utils
+    state: present
+
+# The ipa-client-automount command uses the exit code 3 to indicate that no action is needed
+- name: configure ipa automount
+  ansible.builtin.command: ipa-client-automount -U
+  changed_when: cmd_automount['rc'] != 3
+  failed_when:
+    - cmd_automount['rc'] != 0
+    - cmd_automount['rc'] != 3
+  register: cmd_automount
+  notify: reload autofs
