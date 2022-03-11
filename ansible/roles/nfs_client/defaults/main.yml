@@ -1,12 +1,17 @@
 ipa_automounts_enabled: false
+
+# Value for the dir parameter in /etc/cachefilesd.conf
+# An empty value indicates that the existing value should be left unchanged.
+cachefilesd_dir: ""
+
 autofs_root: /mnt
 
-# List of mountpoints with a local path relative to {{ autofs_root }}.
+# List of mountpoints with a local path relative to {{ autofs_root }}
 # The key "cached" controls whether cachefilesd should be enabled for the mountpoint.
 # autofs_mounts:
 #   - localpath: shared
 #     options: fstype=nfs4,rw,async
 #     server: example.local
 #     remotepath: /srv/shared
-#     cached: false
+#     cached: true
 autofs_mounts: []

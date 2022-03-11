@@ -3,7 +3,6 @@
   become: true
   ansible.builtin.systemd:
     name: cachefilesd
-    daemon_reload: true
     state: restarted
 
 - name: reload autofs
