@@ -1,8 +1,7 @@
 ipa_automounts_enabled: false
 
-# Value for the dir parameter in /etc/cachefilesd.conf
-# An empty value indicates that the existing value should be left unchanged.
-cachefilesd_dir: ""
+cachefilesd_enabled: false
+cachefilesd_dir: /var/cache/fscache
 
 autofs_root: /mnt
 
