@@ -13,7 +13,7 @@
       - ipa
       - automountmap-find
       - default
-      - "auto.{{ mapname }}"
+      - "auto.{{ mountmap['name'] }}"
     tty: true
   become: true
   changed_when: false
@@ -27,7 +27,7 @@
       - ipa
       - automountmap-add
       - default
-      - "auto.{{ mapname }}"
+      - "auto.{{ mountmap['name'] }}"
     tty: true
   become: true
   when: automountmap_search.stdout is search("0 automount maps matched")
@@ -39,8 +39,8 @@
       - ipa
       - automountkey-add
       - default
-      - "--key \"/{{ mapname }}\""
-      - "--info auto.{{ mapname }}"
+      - "--key \"/{{ mountmap['name'] }}\""
+      - "--info auto.{{ mountmap['name'] }}"
       - "auto.master"
     tty: true
   become: true
@@ -54,8 +54,8 @@
       - automountkey-add
       - default
       - "--key \"*\""
-      - "--info \"-fstype=nfs4,rw s1:/dpool/share/{{ mapname }}/&\""
-      - "auto.{{ mapname }}"
+      - "--info \"-{{ 'fsc,' if mountmap['cached'] }}fstype=nfs4,rw s1:/dpool/share/{{ mountmap['name'] }}/&\""
+      - "auto.{{ mountmap['name'] }}"
     tty: true
   become: true
   when: automountmap_search.stdout is search("0 automount maps matched")
