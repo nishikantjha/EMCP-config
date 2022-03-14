@@ -1,0 +1,13 @@
+[Unit]
+Description=Copy "{{ systemd_timers_item['template_vars']['src'] }}" to "{{ systemd_timers_item['template_vars']['dest'] }}" using rsync and log to "%L/%N.log"
+After=remote-fs.target
+ConditionPathExists={{ systemd_timers_item['template_vars']['src'] }}
+ConditionPathExists={{ systemd_timers_item['template_vars']['dest'] }}
+
+[Service]
+Type=oneshot
+ExecStartPre=sh -c 'cat /dev/null > "%L/%N.log"'
+ExecStart=/usr/bin/rsync {{ systemd_timers_item['template_vars']['opts'] }} --log-file="%L/%N.log" "{{ systemd_timers_item['template_vars']['src'] }}" "{{ systemd_timers_item['template_vars']['dest'] }}"
+
+[Install]
+WantedBy=multi-user.target

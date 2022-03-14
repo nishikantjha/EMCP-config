@@ -1,0 +1,34 @@
+---
+- name: Obtain a valid unit name
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/systemd-escape
+      - "{{ systemd_timers_item['service_name'] }}"
+  register: cmd_escape
+
+- name: Install the service file
+  ansible.builtin.template:
+    src: "{{ systemd_timers_item['service_template'] }}"
+    dest: "/etc/systemd/system/{{ cmd_escape['stdout'] }}.service"
+    owner: root
+    group: root
+    mode: 0644
+  when: cmd_escape['stdout']
+  notify: apply systemd changes
+
+- name: Install the timer file
+  ansible.builtin.template:
+    src: "{{ systemd_timers_item['timer_template'] }}"
+    dest: "/etc/systemd/system/{{ cmd_escape['stdout'] }}.timer"
+    owner: root
+    group: root
+    mode: 0644
+  when: cmd_escape['stdout']
+  notify: apply systemd changes
+
+- name: Make sure the timer service is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ cmd_escape['stdout'] }}.timer"
+    state: started
+    enabled: true
+  when: cmd_escape['stdout']
