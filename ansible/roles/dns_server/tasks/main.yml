@@ -100,6 +100,29 @@
     - powerdns
   become: true
 
+- name: stop and disable systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: stopped
+    masked: true
+    enabled: false
+  tags:
+    - dns
+    - powerdns
+  become: true
+
+- name: manually set internal dns server
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - dns
+    - powerdns
+  become: true
+
 - name: launch pdns docker image
   community.docker.docker_container:
     auto_remove: false
@@ -115,17 +138,6 @@
     pull: true
     restart_policy: unless-stopped
     state: started
-  tags:
-    - dns
-    - powerdns
-  become: true
-
-- name: disable systemd-resolved
-  ansible.builtin.systemd:
-    name: systemd-resolved
-    state: stopped
-    masked: true
-    enabled: false
   tags:
     - dns
     - powerdns

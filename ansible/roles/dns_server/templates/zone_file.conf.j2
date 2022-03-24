@@ -13,6 +13,6 @@ $TTL {{ dns_ttl }}
 {% elif record.name is defined %}
 {{ record.name }}  {{ record.class }} {{ record.type }} {{ record.data }}
 {% else %}
-   {{ record.class }} {{ record.type }} {{ record.data }}
+{{ record.class }} {{ record.type }} {{ record.data }}
 {% endif %}
 {% endfor %}
