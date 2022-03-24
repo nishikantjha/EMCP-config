@@ -84,6 +84,8 @@
   become: true
   notify: "restart rke2-{{ rke2_type }}"
 
+# Ansible might report this task as failed when in reality it just needs a
+# little longer to start up.
 - name: start and enable the systemd service
   ansible.builtin.systemd:
     name: "rke2-{{ rke2_type }}.service"
