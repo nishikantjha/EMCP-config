@@ -84,6 +84,8 @@
   become: true
   notify: "restart rke2-{{ rke2_type }}"
 
+# Ansible might report this task as failed when in reality it just needs a
+# little longer to start up.
 - name: start and enable the systemd service
   ansible.builtin.systemd:
     name: "rke2-{{ rke2_type }}.service"
@@ -103,7 +105,9 @@
     path: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     regexp: '(\s+server: https://)127\.0\.0\.1(:6443)'
     replace: '\g<1>{{ rke2_server_url }}\g<2>'
-  when: first_run_server == inventory_hostname
+  when:
+    - first_run_server is defined
+    - first_run_server == inventory_hostname
   become: true
 
 - name: download kubeconfig to controller
@@ -111,12 +115,17 @@
     dest: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
     src: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     flat: true
-  when: first_run_server == inventory_hostname
+  register: downloader_kubeconfig
+  when:
+    - first_run_server is defined
+    - first_run_server == inventory_hostname
 
 - name: change mode of downloaded kubeconfig file
   ansible.builtin.file:
-    path: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    path: "{{ downloader_kubeconfig['dest'] }}"
     mode: 0600
     state: file
-  when: first_run_server == inventory_hostname
+  when:
+    - first_run_server is defined
+    - first_run_server == inventory_hostname
   delegate_to: localhost

@@ -1,6 +1,6 @@
-- name: set temporary variable to find the current main interface
+- name: loop through the network interfaces to find the current main one
   ansible.builtin.set_fact:
-    temp_dict: "{{ lookup('vars', 'ansible_' + set_default_gw_item)['ipv4']['network'] }}"
+    main_interface: "{{ set_default_gw_item }}"
   loop: "{{ ansible_interfaces }}"
   loop_control:
     loop_var: set_default_gw_item
@@ -9,11 +9,6 @@
     - '"flannel" not in set_default_gw_item'
     - '"cali" not in set_default_gw_item'
     - lookup('vars', 'ansible_' + set_default_gw_item)['ipv4']['network'] == main_network
-  register: test_var
-
-- name: set the main interface variable
-  ansible.builtin.set_fact:
-    main_interface: "{{ test_var['results'] | selectattr('skipped', 'undefined') | first | community.general.json_query('item') }}"
 
 - name: retrieve cloud-init information
   community.general.cloud_init_data_facts:
