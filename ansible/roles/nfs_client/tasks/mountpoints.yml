@@ -3,6 +3,9 @@
   ansible.builtin.file:
     path: "{{ autofs_root }}"
     state: directory
+    owner: root
+    group: root
+    mode: 0755
 
 - name: Copy the map file
   ansible.builtin.template:
