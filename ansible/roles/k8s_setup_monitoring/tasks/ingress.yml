@@ -1,7 +1,7 @@
 - name: create monitoring auth secret
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: v1
       kind: Secret
@@ -14,7 +14,7 @@
 - name: basic auth monitoring middleware
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: traefik.containo.us/v1alpha1
       kind: Middleware
@@ -28,7 +28,7 @@
 - name: build monitoring ingress routes
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: traefik.containo.us/v1alpha1
       kind: IngressRoute

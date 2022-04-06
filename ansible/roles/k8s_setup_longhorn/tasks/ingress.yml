@@ -1,7 +1,7 @@
 - name: build svc-wss-headers middleware
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: traefik.containo.us/v1alpha1
       kind: Middleware
@@ -16,7 +16,7 @@
 - name: strip prefix longhorn middleware
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: traefik.containo.us/v1alpha1
       kind: Middleware
@@ -32,7 +32,7 @@
 - name: create longhorn auth secret
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: v1
       kind: Secret
@@ -45,7 +45,7 @@
 - name: basic auth longhorn middleware
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: traefik.containo.us/v1alpha1
       kind: Middleware
@@ -59,7 +59,7 @@
 - name: build ingress route
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: traefik.containo.us/v1alpha1
       kind: IngressRoute

@@ -12,7 +12,7 @@
     - longhorn
     - longhorn-install
   run_once: true
-  delegate_to: localhost
+  delegate_to: "{{ primary_rke2_server }}"
 
 - name: include IngressRoutes tasks
   block:
@@ -21,5 +21,5 @@
     - longhorn
     - longhorn-ui-ingress
   run_once: true
-  delegate_to: localhost
+  delegate_to: "{{ primary_rke2_server }}"
   become: true

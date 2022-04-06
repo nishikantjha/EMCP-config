@@ -5,7 +5,7 @@
     - traefik
     - metallb
   run_once: true
-  delegate_to: localhost
+  delegate_to: "{{ primary_rke2_server }}"
 
 - name: include traefik install tasks
   block:
@@ -13,5 +13,5 @@
   tags:
     - traefik
   run_once: true
-  delegate_to: localhost
+  delegate_to: "{{ primary_rke2_server }}"
   become: true

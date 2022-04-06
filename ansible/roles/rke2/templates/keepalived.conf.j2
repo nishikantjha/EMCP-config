@@ -14,7 +14,7 @@ vrrp_script chk_apiserver {
 vrrp_instance VI_1 {
   interface {{ ansible_default_ipv4.interface }}
   virtual_router_id 11
-{% if groups[rke2_servers_group_name].0 == inventory_hostname|string() %}
+{% if primary_rke2_server == inventory_hostname|string() %}
   state MASTER
 {% else %}
   state BACKUP
