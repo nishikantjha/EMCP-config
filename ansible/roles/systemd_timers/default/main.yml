@@ -1,0 +1,10 @@
+# Example:
+#   systemd_timers:
+#     - service_name: projects_backup
+#       service_template: systemd-rsync-service.j2
+#       timer_template: systemd-daily-timer.j2
+#       template_vars:
+#         src: /myprojects
+#         dest: /mnt/nas/
+#         opts: -a
+systemd_timers: []

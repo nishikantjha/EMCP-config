@@ -1,0 +1,10 @@
+---
+- name: Install systemd services with associated timers
+  become: true
+  block:
+    - include_tasks: systemd-service-timer.yml
+      loop: "{{ systemd_timers }}"
+      loop_control:
+        loop_var: systemd_timers_item
+      when: (systemd_timers | length) > 0
+  tags: systemd-timers
