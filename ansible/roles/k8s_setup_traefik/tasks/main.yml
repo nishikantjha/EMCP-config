@@ -4,14 +4,10 @@
   tags:
     - traefik
     - metallb
-  run_once: true
-  delegate_to: "{{ primary_rke2_server }}"
 
 - name: include traefik install tasks
   block:
     - include_tasks: install_traefik.yml
   tags:
     - traefik
-  run_once: true
-  delegate_to: "{{ primary_rke2_server }}"
   become: true

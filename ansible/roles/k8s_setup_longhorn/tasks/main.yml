@@ -8,18 +8,16 @@
 - name: include longhorn install tasks
   block:
     - include_tasks: setup.yml
+  when: inventory_hostname in groups[rke2_primary_server_group_name]
   tags:
     - longhorn
     - longhorn-install
-  run_once: true
-  delegate_to: "{{ primary_rke2_server }}"
 
 - name: include IngressRoutes tasks
   block:
     - include_tasks: ingress.yml
+  when: inventory_hostname in groups[rke2_primary_server_group_name]
   tags:
     - longhorn
     - longhorn-ui-ingress
-  run_once: true
-  delegate_to: "{{ primary_rke2_server }}"
   become: true

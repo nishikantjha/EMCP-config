@@ -143,7 +143,7 @@
     - rke2
     - k8s_setup_longhorn
 
-- hosts: rke_masters
+- hosts: primary_rke2_server
   gather_facts: true
   remote_user: ubuntu
   roles:

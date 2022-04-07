@@ -6,6 +6,10 @@
   environment: "{{ proxy_env }}"
   become: true
 
+- name: determine the type of node
+  ansible.builtin.set_fact:
+    rke2_type: "{{ (inventory_hostname in groups[rke2_servers_group_name]) | ternary('server', 'agent') }}"
+
 - name: populate service facts
   ansible.builtin.service_facts:
   become: true
@@ -34,28 +38,6 @@
   when: (rke2_version != ( installed_rke2_version.stdout | default({})))
         or installed_rke2_version is not defined
   become: true
-
-- name: retrieve primary active server
-  ansible.builtin.uri:
-    url: "https://{{ rke2_server_url }}:{{ rke2_apiserver_dest_port }}"
-    method: GET
-    return_content: true
-    use_proxy: false
-    validate_certs: false
-    status_code:
-      - 401
-      - "-1"
-  register: apiserver_curl
-
-- name: set current_server_is_not_first variable
-  ansible.builtin.set_fact:
-    current_server_is_not_first: true
-  when: apiserver_curl['status'] == 401
-
-- name: set current_server_is_not_first variable
-  ansible.builtin.set_fact:
-    current_server_is_not_first: false
-  when: apiserver_curl['status'] != 401
 
 - name: create rke2 config dir
   ansible.builtin.file:
@@ -93,19 +75,10 @@
     enabled: true
   become: true
 
-- name: set the first_run_server variable
-  ansible.builtin.set_fact:
-    first_run_server: "{{ inventory_hostname }}"
-  when:
-    - first_run_server is not defined
-    - rke2_type == "server"
-
 - name: change server reference in kubeconfig from localhost to actual url
   ansible.builtin.replace:
     path: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     regexp: '(\s+server: https://)127\.0\.0\.1(:6443)'
     replace: '\g<1>{{ rke2_server_url }}\g<2>'
-  when:
-    - first_run_server is defined
-    - first_run_server == inventory_hostname
+  when: rke2_type == 'server'
   become: true
