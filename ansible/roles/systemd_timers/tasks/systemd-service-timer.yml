@@ -4,6 +4,7 @@
     argv:
       - /usr/bin/systemd-escape
       - "{{ systemd_timers_item['service_name'] }}"
+  changed_when: false
   register: cmd_escape
 
 - name: Install the service file
