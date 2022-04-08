@@ -64,6 +64,10 @@ local kp =
               },
             },
           },  // storage
+          additionalScrapeConfigs: {
+            name: 'additional-scrape-configs',
+            key: 'config',
+          },
         }, // spec
       }, // prometheus
     }, // prometheus
