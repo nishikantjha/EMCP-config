@@ -1,0 +1,10 @@
+{% if inventory_groups_to_scrape is defined and inventory_groups_to_scrape != "" %}
+scrape_config:
+  - job_name: "externalTargets"
+    static_configs:
+{% for group in inventory_groups_to_scrape %}
+{% for server in groups['{{ group }}'] %}
+      - targets: ["{{ server }}:{{ metrics_listen_port }}"]
+{% endfor %}
+{% endfor %}
+{% endif %}
