@@ -5,7 +5,7 @@
     - monitoring
     - kube-prometheus
   run_once: true
-  delegate_to: localhost
+  delegate_to: "{{ primary_rke2_server }}"
 
 - name: include ingress setup tasks
   block:
@@ -14,4 +14,4 @@
     - monitoring
     - monitoring-ingress
   run_once: true
-  delegate_to: localhost
+  delegate_to: "{{ primary_rke2_server }}"
