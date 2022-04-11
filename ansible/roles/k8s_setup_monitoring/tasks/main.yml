@@ -7,6 +7,15 @@
     - monitoring
     - kube-prometheus
 
+- name: include external prometheus target tasks
+  block:
+    - include_tasks: configure_prometheus_targets.yml
+  tags:
+    - monitoring
+    - prometheus-targets
+  run_once: true
+  delegate_to: localhost
+
 - name: include ingress setup tasks
   block:
     - include_tasks: ingress.yml

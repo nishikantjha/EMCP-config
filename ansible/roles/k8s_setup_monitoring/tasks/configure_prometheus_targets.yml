@@ -2,27 +2,13 @@
 - name: create prometheus additional config resource
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: v1
       kind: Secret
       metadata:
         name: additional-scrape-configs
+        namespace: monitoring
       data:
-        config: "{{ lookup('template', scrape_config.yml.j2) | string | b64encode }}"
+        config: "{{ scrape_config | string | b64encode }}"
   register: scrape_config_result
-
-- name: delete the prometheus pods when scrape config changed
-  kubernetes.core.k8s:
-    state: absent
-    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
-    api_version: v1
-    kind: Pod
-    namespace: monitoring
-    name: "{{ k8s_setup_monitoring_item }}"
-  loop:
-    - prometheus-k8s-0
-    - prometheus-k8s-1
-  loop_control:
-    loop_var: k8s_setup_monitoring_item
-  when: scrape_config_result is changed
