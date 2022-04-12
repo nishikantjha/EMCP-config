@@ -128,7 +128,7 @@
     auto_remove: false
     detach: true
     image: "{{ pdns_image }}:{{ pdns_image_tag }}"
-    volumes: 
+    volumes:
       - "{{ pdns_mount_host_path }}/config:{{ pdns_container_config_path }}"
       - "{{ pdns_mount_host_path }}/data:{{ pdns_container_data_path }}"
     name: "{{ pdns_container_name }}"
