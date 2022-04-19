@@ -1,5 +1,0 @@
-packer_version: 1.7.4
-packer_arch: amd64
-packer_maas_repo_snapshot: 9d3387125427c30d27b7a0233214b92a2ff610fa
-packer_maas_working_copy: /tmp/nvidia-packer-maas
-maas_admin: admin
