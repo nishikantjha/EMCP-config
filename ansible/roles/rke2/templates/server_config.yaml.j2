@@ -1,5 +1,5 @@
-token: {{ rke2_token }}
 {% if inventory_hostname not in groups[rke2_primary_server_group_name] %}
+token: {{ rke2_token }}
 server: https://{{ rke2_server_url }}:9345
 {% endif %}
 
