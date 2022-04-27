@@ -121,17 +121,6 @@
     - user_skel
 
 
-- hosts: tio
-  become: true
-  ignore_errors: true
-  remote_user: ubuntu
-  gather_facts: true
-  environment: "{{ proxy_env | default({}) }}"
-  roles:
-    - tio_users
-    - user_skel
-
-
 - hosts: ship
   become: true
   ignore_errors: true
