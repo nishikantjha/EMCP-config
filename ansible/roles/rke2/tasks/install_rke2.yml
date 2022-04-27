@@ -66,6 +66,27 @@
   become: true
   notify: "restart rke2-{{ rke2_type }}"
 
+- name: create a systemd service config directory
+  ansible.builtin.file:
+    path: "/etc/systemd/system/rke2-{{ rke2_type }}.service.d"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  when: inventory_hostname in groups[rke2_primary_server_group_name]
+  become: true
+
+- name: write the secret token in a systemd service configuration file
+  ansible.builtin.template:
+    src: rke2-token.conf.j2
+    dest: "/etc/systemd/system/rke2-{{ rke2_type }}.service.d/rke2-token.conf"
+    owner: root
+    group: root
+    mode: 0600
+  when: inventory_hostname in groups[rke2_primary_server_group_name]
+  become: true
+  notify: "restart rke2-{{ rke2_type }}"
+
 # Ansible might report this task as failed when in reality it just needs a
 # little longer to start up.
 - name: start and enable the systemd service
