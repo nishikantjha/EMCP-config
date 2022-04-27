@@ -19,6 +19,7 @@
   roles:
     - update
     - security
+    - proxies
 
 
 - hosts: infra
@@ -135,7 +136,6 @@
   gather_facts: true
   remote_user: ubuntu
   roles:
-    - proxies
     - set_default_gw
     - rke2
     - k8s_setup_longhorn
@@ -146,3 +146,17 @@
   roles:
     - k8s_setup_traefik
     - k8s_setup_monitoring
+
+- hosts: staging_k8s_cluster
+  gather_facts: true
+  remote_user: ubuntu
+  roles:
+    - set_default_gw
+    - rke2
+    - k8s_setup_longhorn
+
+- hosts: staging_primary_rke2_server
+  gather_facts: true
+  remote_user: ubuntu
+  roles:
+    - k8s_setup_traefik
