@@ -19,6 +19,7 @@
   roles:
     - update
     - security
+    - proxies
 
 
 - hosts: infra
@@ -135,7 +136,6 @@
   gather_facts: true
   remote_user: ubuntu
   roles:
-    - proxies
     - set_default_gw
     - rke2
     - k8s_setup_longhorn
