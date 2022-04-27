@@ -49,6 +49,7 @@
   loop: "{{ ansible_play_hosts }}"
   loop_control:
     loop_var: k8s_setup_longhorn_item
+  become: true
 
 - name: install longhorn helm repo
   kubernetes.core.helm_repository:
