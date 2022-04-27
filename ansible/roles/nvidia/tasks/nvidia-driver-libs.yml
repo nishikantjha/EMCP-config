@@ -1,9 +1,18 @@
-- name: Install gpu drivers and the cuda toolkit
+- name: Install gpu drivers
   vars:
     nvidia_driver_ubuntu_install_from_cuda_repo: true
-    nvidia_driver_ubuntu_cuda_package: "{{ cuda_package_name }}"
+    nvidia_driver_branch: "{{ cuda_driver_version }}"
   ansible.builtin.include_role:
     name: nvidia.nvidia_driver
+
+- name: Test the driver installation
+  ansible.builtin.command: /usr/bin/nvidia-smi
+  changed_when: false
+
+- name: Install the cuda toolkit
+  ansible.builtin.apt:
+    name: "{{ cuda_toolkit_package_name }}"
+    state: present
 
 - name: Add the cuda compiler to PATH
   ansible.builtin.copy:
@@ -13,17 +22,13 @@
     group: root
     mode: 0644
 
+- name: Test the cuda installation
+  ansible.builtin.command: /usr/local/cuda/bin/nvcc -V
+  changed_when: false
+
 - name: Install cuDNN
   ansible.builtin.apt:
     name:
       - "{{ cudnn_package_spec }}"
       - "{{ cudnn_dev_package_spec }}"
     state: present
-
-- name: Test the driver installation
-  ansible.builtin.command: /usr/bin/nvidia-smi
-  changed_when: false
-
-- name: Test the cuda installation
-  ansible.builtin.command: /usr/local/cuda/bin/nvcc -V
-  changed_when: false
