@@ -1,6 +1,8 @@
 - name: include kube-prometheus setup tasks
   block:
     - include_tasks: install_kube_prometheus.yml
+  when: inventory_hostname in groups[rke2_servers_group_name]
+  run_once: true
   tags:
     - monitoring
     - kube-prometheus
@@ -8,6 +10,8 @@
 - name: include ingress setup tasks
   block:
     - include_tasks: ingress.yml
+  when: inventory_hostname in groups[rke2_servers_group_name]
+  run_once: true
   tags:
     - monitoring
     - monitoring-ingress
