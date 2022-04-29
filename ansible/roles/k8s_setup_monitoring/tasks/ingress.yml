@@ -10,6 +10,7 @@
         namespace: monitoring
       data:
         users: "{{ monitoring_http_auth_pass }}"
+  become: true
 
 - name: basic auth monitoring middleware
   kubernetes.core.k8s:
@@ -24,6 +25,7 @@
       spec:
         basicAuth:
           secret: monitoring-auth-secret
+  become: true
 
 - name: build monitoring ingress routes
   kubernetes.core.k8s:
@@ -57,3 +59,4 @@
               - name: "{{ alertmanager_service_name }}"
                 namespace: monitoring
                 port: web
+  become: true
