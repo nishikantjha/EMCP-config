@@ -7,5 +7,6 @@
       - zsh
       - openslide-tools
       - rename
+      - direnv
     state: present
   tags: g-node-devtools
