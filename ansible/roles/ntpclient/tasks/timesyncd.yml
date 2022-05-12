@@ -1,0 +1,27 @@
+---
+- name: Make sure that ntpd and chrony are uninstalled
+  ansible.builtin.apt:
+    name:
+      - ntp
+      - chrony
+    state: absent
+
+- name: Make sure that timesyncd is installed
+  ansible.builtin.apt:
+    name:
+      - systemd-timesyncd
+    state: present
+
+- name: Enable and start the timesyncd service
+  ansible.builtin.systemd:
+    name: systemd-timesyncd
+    state: started
+    masked: false
+    enabled: true
+
+- name: Verify that timesyncd is configured correctly
+  ansible.builtin.command: timedatectl show-timesync
+  register: cmd_timedatectl
+  changed_when: false
+  failed_when: ('ServerAddress=' ~ ntp_server_ip) not in cmd_timedatectl['stdout_lines']
+  become: false

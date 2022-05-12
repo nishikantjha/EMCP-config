@@ -1,0 +1,6 @@
+---
+- name: Verify that the NTP client is configured correctly
+  become: true
+  block:
+    - include_tasks: timesyncd.yml
+  tags: ntpclient
