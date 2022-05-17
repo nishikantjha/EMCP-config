@@ -9,3 +9,11 @@
     ipa_pass: "{{ ipaadmin_password }}"
     validate_certs: false
   become: true
+
+- name: configure the default login shell
+  community.general.ipa_config:
+    ipadefaultloginshell: "{{ ipa_default_shell }}"
+    ipa_host: "{{ primary_ipaserver }}"
+    ipa_pass: "{{ ipaadmin_password }}"
+    validate_certs: false
+  become: true
