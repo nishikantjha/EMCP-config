@@ -27,6 +27,9 @@
         - bioconda
         - defaults
     dest: /opt/mambaforge/.condarc
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
 
 - name: Set permissions
   ansible.builtin.file:
