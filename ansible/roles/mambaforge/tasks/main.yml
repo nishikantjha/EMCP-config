@@ -19,7 +19,7 @@
 
 - name: Configure mambaforge
   # Ensure that mamba works robustly and uses the major channels in the right way.
-  copy:
+  ansible.builtin.copy:
     content: |
       channel_priority: strict  # see https://conda-forge.org/docs/user/tipsandtricks.html
       channels:  # see https://bioconda.github.io
