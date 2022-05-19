@@ -7,7 +7,7 @@
     givenname: "{{ users_item['givenname'] | default('-') }}"
     sn: "{{ users_item['sn'] | default('-') }}"
     mail: "{{ users_item['email'] | default(omit) }}"
-    loginshell: "{{ users_item['loginshell'] | default(default_shell) }}"
+    loginshell: "{{ users_item['loginshell'] | default(omit) }}"
     sshpubkey: "{{ users_item['sshpubkey'] | default(omit) }}"
     validate_certs: false
     state: present

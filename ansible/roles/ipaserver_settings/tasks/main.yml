@@ -13,6 +13,7 @@
     - include_tasks: ensure_general_config.yml
   run_once: true
   tags:
+    - ipa-generalconfig
     - ipa-settings
 
 - name: include ipa hostgroups tasks
@@ -20,16 +21,16 @@
     - include_tasks: create_hostgroups.yml
   run_once: true
   tags:
-    - ipa-settings
     - ipa-hostgroups
+    - ipa-settings
 
 - name: include ipa habac rule tasks
   block:
     - include_tasks: create_hbacrules.yml
   run_once: true
   tags:
-    - ipa-settings
     - ipa-hbacrules
+    - ipa-settings
 
 # FIXME: kerberos authentication needed to automatically create the automountmaps
 # - name: include automountmaps tasks
