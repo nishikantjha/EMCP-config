@@ -17,6 +17,20 @@
   ansible.builtin.command: bash /tmp/mambaforge.sh -b -p /opt/mambaforge
   when: cmd_conda_version.rc != 0
 
+- name: Configure mambaforge
+  # Ensure that mamba works robustly and uses the major channels in the right way.
+  ansible.builtin.copy:
+    content: |
+      channel_priority: strict  # see https://conda-forge.org/docs/user/tipsandtricks.html
+      channels:  # see https://bioconda.github.io
+        - conda-forge
+        - bioconda
+        - defaults
+    dest: /opt/mambaforge/.condarc
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
 - name: Set permissions
   ansible.builtin.file:
     path: /opt/mambaforge
