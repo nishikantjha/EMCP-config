@@ -1,0 +1,2 @@
+keyrings_path: /usr/share/keyrings
+seafile_key_path: "{{ keyrings_path }}/seafile-keyring.asc"

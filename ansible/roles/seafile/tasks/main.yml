@@ -3,17 +3,22 @@
   ansible.builtin.apt:
     name: ca-certificates
     state: present
+  tags:
+    - seafile
 
-- name: Add the signing key
-  ansible.builtin.apt_key:
+- name: Download the signing key
+  ansible.builtin.get_url:
     url: https://linux-clients.seafile.com/seafile.asc
-    state: present
+    dest: "{{ seafile_key_path }}"
+    owner: root
+    group: root
+    mode: 0644
   tags:
     - seafile
 
 - name: Add the repository
   ansible.builtin.apt_repository:
-    repo: deb https://linux-clients.seafile.com/seafile-deb/{{ ansible_distribution_release }}/ stable main
+    repo: "deb [arch=amd64 signed-by={{ seafile_key_path }}] https://linux-clients.seafile.com/seafile-deb/{{ ansible_distribution_release }}/ stable main"
     state: present
   tags:
     - seafile
