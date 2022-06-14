@@ -1,2 +1,0 @@
-kubic_repo_url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/testing/xUbuntu_{{ ansible_distribution_version }}"
-kubic_key_filename: github-containers-kubic.key

@@ -1,7 +1,8 @@
 ---
-- name: Install Podman
-  block:
-    - include_tasks: podman-install.yml
+- name: Install podman
+  ansible.builtin.apt:
+    name: podman
+    state: present
   tags: podman
 
 - name: Prepare the parent directory for rootless container storage
