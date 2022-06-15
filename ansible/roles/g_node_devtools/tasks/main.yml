@@ -1,11 +1,6 @@
 ---
 - name: Install development tools
-  ansible.builtin.apt:
-    name:
-      - python3-venv
-      - tmux
-      - zsh
-      - rename
-      - direnv
-    state: present
+  become: true
+  block:
+    - include_tasks: devtools.yml
   tags: g-node-devtools
