@@ -1,7 +1,14 @@
 ipa_automounts_enabled: false
 
 cachefilesd_enabled: false
-cachefilesd_dir: /var/cache/fscache
+
+# List of options to override in /etc/cachefilesd.conf.
+# cachefilesd_options:
+#   - name: dir
+#     value: /var/cache/fscache
+#   - name: brun
+#     value: "10%"
+cachefilesd_options: []
 
 autofs_root: /mnt
 

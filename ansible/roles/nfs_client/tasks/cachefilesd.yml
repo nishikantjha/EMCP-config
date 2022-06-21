@@ -9,13 +9,17 @@
     enabled: true
     state: started
 
-- name: Copy the configuration file
-  ansible.builtin.template:
-    src: cachefilesd.conf.j2
-    dest: /etc/cachefilesd.conf
+- name: Tweak the cachefilesd settings
+  ansible.builtin.lineinfile:
+    path: /etc/cachefilesd.conf
+    regexp: "^{{ nfs_client_item['name'] }}\\s"
+    line: "{{ nfs_client_item['name'] }} {{ nfs_client_item['value'] }}"
     owner: root
     group: root
     mode: 0644
+  loop: "{{ cachefilesd_options }}"
+  loop_control:
+    loop_var: nfs_client_item
   when: cachefilesd_enabled
   notify: restart cachefilesd
 
