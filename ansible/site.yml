@@ -1,4 +1,13 @@
 ---
+- hosts: all
+  remote_user: ubuntu
+  roles:
+    - timezone
+
+- hosts: all:!origin
+  remote_user: ubuntu
+  roles:
+    - ntpclient
 
 - hosts: dns_servers
   become: true
@@ -81,12 +90,6 @@
   remote_user: ubuntu
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
-  pre_tasks:
-    - name: Install prerequisites
-      ansible.builtin.apt:
-        name:
-          - chrony
-      tags: freeIPA-client
   roles:
     - role: freeipa.ansible_freeipa.ipaclient
       state: present
