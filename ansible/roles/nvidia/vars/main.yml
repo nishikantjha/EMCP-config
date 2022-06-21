@@ -1,4 +1,4 @@
 cuda_toolkit_package_name: "cuda-{{ cuda_toolkit_version | replace('.', '-') }}"
 cudnn_package_spec: "{{ cudnn_base_name }}={{ cudnn_version }}-1+cuda{{ cuda_toolkit_version }}"
 cudnn_dev_package_spec: "{{ cudnn_base_name }}-dev={{ cudnn_version }}-1+cuda{{ cuda_toolkit_version }}"
-cuda_nvidia_image: "nvidia/cuda:{{ cuda_toolkit_version }}.0-base"
+cuda_nvidia_image: "nvidia/cuda:{{ cuda_toolkit_version }}.0-base-{{ ansible_distribution | lower }}{{ ansible_distribution_version }}"
