@@ -25,10 +25,3 @@
 - name: Test the cuda installation
   ansible.builtin.command: /usr/local/cuda/bin/nvcc -V
   changed_when: false
-
-- name: Install cuDNN
-  ansible.builtin.apt:
-    name:
-      - "{{ cudnn_package_spec }}"
-      - "{{ cudnn_dev_package_spec }}"
-    state: present
