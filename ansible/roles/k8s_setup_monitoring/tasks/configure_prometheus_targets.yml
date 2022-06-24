@@ -2,7 +2,7 @@
 - name: create prometheus additional config resource
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "{{ rke2_download_kubeconf_path }}{{ rke2_download_kubeconf_file_name }}"
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
     definition:
       apiVersion: v1
       kind: Secret
