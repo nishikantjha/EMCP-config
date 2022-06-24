@@ -10,6 +10,9 @@ metadata:
   name: k8s
   namespace: monitoring
 spec:
+  additionalScrapeConfigs:
+    key: config
+    name: additional-scrape-configs
   alerting:
     alertmanagers:
     - apiVersion: v2
