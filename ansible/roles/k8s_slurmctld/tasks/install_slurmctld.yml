@@ -1,0 +1,124 @@
+
+- name: ensure slurmctld namespace
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
+    api_version: v1
+    kind: Namespace
+    name: "{{ slurm_namespace }}"
+
+- name: create slurmctld service
+  kubernetes.core.k8s:
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        namespace: "{{ slurm_namespace }}"
+        name: slurmctld-service
+      spec:
+        selector:
+          app: slurmctld
+        ports:
+          - name: slurmctld
+            protocol: TCP
+            port: "{{ slurmctld_external_port }}"
+            targetPort: "{{ slurmctld_internal_port }}"
+    state: present
+
+- name: create slurmctld ssh service
+  kubernetes.core.k8s:
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        namespace: "{{ slurm_namespace }}"
+        name: slurmctldssh-service
+      spec:
+        selector:
+          app: slurmctld
+        ports:
+          - name: slurmctldssh
+            protocol: TCP
+            port: "{{ slurmctld_external_ssh_port }}"
+            targetPort: "{{ slurmctld_internal_ssh_port }}"
+    state: present
+
+- name: create slurmctld ingress route
+  kubernetes.core.k8s:
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: traefik.containo.us/v1alpha1
+      kind: IngressRouteTCP
+      metadata:
+        name: slurmctld-route
+        namespace: "{{ slurm_namespace }}"
+      spec:
+        entryPoints:
+          - slurmctld
+        routes:
+          - match: "HostSNI(`*`)"
+            services:
+              - name: slurmctld-service
+                namespace: "{{ slurm_namespace }}"
+                port: "{{ slurmctld_external_port }}"
+    state: present
+
+- name: create slurmctld ssh ingress route
+  kubernetes.core.k8s:
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: traefik.containo.us/v1alpha1
+      kind: IngressRouteTCP
+      metadata:
+        name: slurmctldssh-route
+        namespace: "{{ slurm_namespace }}"
+      spec:
+        entryPoints:
+          - slurmctldssh
+        routes:
+          - match: "HostSNI(`*`)"
+            services:
+              - name: slurmctldssh-service
+                namespace: "{{ slurm_namespace }}"
+                port: "{{ slurmctld_external_ssh_port }}"
+    state: present
+
+- name: create slurmctld deployment
+  kubernetes.core.k8s:
+    kubeconfig: "{{ rke2_kubeconf_host_path }}{{ rke2_download_kubeconf_file_name }}"
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "{{ slurmctld_deployment_name }}"
+        namespace: "{{ slurm_namespace }}"
+        labels:
+          app: slurmctld
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: slurmctld
+        template:
+          metadata:
+            labels:
+              app: slurmctld
+          spec:
+            containers:
+              - name: slurmctld
+                image: "{{ slurmctld_image_url }}"
+                resources:
+                  requests:
+                    memory: "{{ slurmctld_resources_req_mem }}"
+                    cpu: "{{ slurmctld_resources_req_cpu }}"
+                  limits:
+                    memory: "{{ slurmctld_resources_lim_mem }}"
+                    cpu: "{{ slurmctld_resources_lim_cpu }}"
+                ports:
+                  - containerPort: "{{ slurmctld_internal_port }}"
+                  - containerPort: "{{ slurmctld_internal_ssh_port }}"
+            imagePullSecrets:
+              - name: "{{ slurmctld_image_registry_secret_name }}"
+    state: present
