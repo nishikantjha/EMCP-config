@@ -132,8 +132,8 @@
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
   roles:
+    - nfs_client
     - seafile
-    - user_skel
 
 - hosts: rke_k8s_cluster
   gather_facts: true
