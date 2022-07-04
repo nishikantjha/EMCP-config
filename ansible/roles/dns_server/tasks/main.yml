@@ -88,7 +88,7 @@
     - powerdns
   become: true
 
-- name: write the bind backend config file
+- name: write the bind zone file
   ansible.builtin.template:
     src: "zone_file.conf.j2"
     dest: "{{ pdns_mount_host_path }}/data/{{ ikim_zone_file_name }}"
