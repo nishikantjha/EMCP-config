@@ -3,17 +3,22 @@ ipa_automounts_enabled: false
 cachefilesd_enabled: false
 
 # List of options to override in /etc/cachefilesd.conf.
+# See `man cachefilesd.conf` for details.
+# Example:
 # cachefilesd_options:
 #   - name: dir
 #     value: /var/cache/fscache
 #   - name: brun
-#     value: "10%"
+#     value: 20%
+#   - name: frun
+#     value: 20%
 cachefilesd_options: []
 
 autofs_root: /mnt
 
 # List of mountpoints with a local path relative to {{ autofs_root }}
 # The key "cached" controls whether cachefilesd should be enabled for the mountpoint.
+# Example:
 # autofs_mounts:
 #   - localpath: shared
 #     options: fstype=nfs4,rw,async
