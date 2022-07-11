@@ -67,6 +67,7 @@
     - nvidia
     - miniconda
     - g_node_devtools
+    - seafile
     - poetry
 
 
@@ -98,7 +99,7 @@
     - role: subidmap
 
 
-- hosts: managed_cluster
+- hosts: nfs_clients
   become: true
   ignore_errors: true
   remote_user: ubuntu
@@ -124,16 +125,6 @@
     - nfs_shares
     - user_skel
 
-
-- hosts: ship
-  become: true
-  ignore_errors: true
-  remote_user: ubuntu
-  gather_facts: true
-  environment: "{{ proxy_env | default({}) }}"
-  roles:
-    - nfs_client
-    - seafile
 
 - hosts: rke_k8s_cluster
   gather_facts: true
