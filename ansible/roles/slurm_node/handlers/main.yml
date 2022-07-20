@@ -1,0 +1,6 @@
+---
+- name: restart sssd
+  become: true
+  ansible.builtin.systemd:
+    name: sssd
+    state: restarted
