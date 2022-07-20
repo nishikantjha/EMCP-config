@@ -1,0 +1,8 @@
+- name: include slurmctld install tasks
+  block:
+    - include_tasks: install_slurmctld.yml
+  when: inventory_hostname in groups[rke2_servers_group_name]
+  run_once: true
+  tags:
+    - slurm
+    - slurmctld

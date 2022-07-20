@@ -99,6 +99,16 @@ ports:
     expose: true
     exposedPort: 8086
     protocol: TCP
+  slurmctld:
+    port: 6817
+    expose: true
+    exposedPort: 6817
+    protocol: TCP
+  slurmctldssh:
+    port: 2222
+    expose: true
+    exposedPort: 2222
+    protocol: TCP
 tlsOptions: {}
 service:
   enabled: true
