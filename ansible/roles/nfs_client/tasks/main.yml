@@ -19,6 +19,10 @@
   when: ipa_automounts_enabled
   tags: nfs-client
 
+- name: Flush any autofs handlers before setting up cachefilesd
+  ansible.builtin.meta: flush_handlers
+  tags: nfs-client
+
 - name: Configure cachefilesd
   become: true
   block:
