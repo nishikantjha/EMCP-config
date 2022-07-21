@@ -6,7 +6,7 @@
     owner: root
     group: root
     mode: 0755
-  notify: activate server via systemd
+  notify: restart freeipa service
   tags: freeIPA-server
 
 - name: Copy the installation argument file
@@ -16,7 +16,7 @@
     owner: root
     group: root
     mode: 0600
-  notify: activate server via systemd
+  notify: restart freeipa service
   tags: freeIPA-server
 
 - name: Obtain information about network interfaces from resolvectl
@@ -32,7 +32,7 @@
     owner: root
     group: root
     mode: 0644
-  notify: activate server via systemd
+  notify: restart freeipa service
   when: resolvectl_command is defined
   tags: freeIPA-server
 
@@ -40,6 +40,8 @@
   ansible.builtin.systemd:
     name: "{{ server_service_name }}"
     state: started
+    enabled: true
+    daemon_reload: true
   tags: freeIPA-server
 
 - name: Copy the ufw configuration file
