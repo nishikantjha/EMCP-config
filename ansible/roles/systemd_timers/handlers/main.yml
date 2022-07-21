@@ -1,5 +1,9 @@
 ---
-- name: apply systemd changes
+- name: restart timer units
   become: true
   ansible.builtin.systemd:
-    daemon_reload: true
+    name: "{{ systemd_timers_item }}.timer"
+    state: restarted
+  loop: "{{ changed_timer_units }}"
+  loop_control:
+    loop_var: systemd_timers_item
