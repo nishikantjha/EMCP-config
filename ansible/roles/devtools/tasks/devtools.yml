@@ -7,6 +7,9 @@
       - zsh
       - rename
       - direnv
+      - jq
+      - tree
+      - unzip
     state: present
 
 - name: Install Python 3.9 on Ubuntu hosts older than 22.04

@@ -3,4 +3,4 @@
   become: true
   block:
     - include_tasks: devtools.yml
-  tags: g-node-devtools
+  tags: devtools
