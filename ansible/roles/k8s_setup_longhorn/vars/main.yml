@@ -1,0 +1,4 @@
+multipath_longhorn_conf_filename: 01_longhorn.conf
+
+# Pattern of device names created by Longhorn
+multipath_longhorn_regex: "^sd[a-z0-9]+"
