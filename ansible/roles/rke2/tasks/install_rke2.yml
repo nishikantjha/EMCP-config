@@ -103,3 +103,22 @@
     replace: '\g<1>{{ rke2_server_url }}\g<2>'
   when: rke2_type == 'server'
   become: true
+
+- name: Add the KUBECONFIG environment variable
+  ansible.builtin.template:
+    src: "{{ kubeconfig_env_filename }}.j2"
+    dest: "/etc/profile.d/{{ kubeconfig_env_filename }}"
+    owner: root
+    group: root
+    mode: 0755
+  when: rke2_type == 'server'
+  become: true
+
+- name: Add Rancher's bin directory to PATH
+  ansible.builtin.copy:
+    src: "{{ kubectl_env_filename }}"
+    dest: "/etc/profile.d/{{ kubectl_env_filename }}"
+    owner: root
+    group: root
+    mode: 0755
+  become: true
