@@ -1,3 +1,11 @@
+---
+# Source: https://longhorn.io/kb/troubleshooting-volume-with-multipath/
+- name: Disallow multipath on Longhorn devices
+  block:
+    - include_tasks: multipath-disallow.yml
+  tags: longhorn-multipath-disallow
+  become: true
+
 - name: include longhorn preparation tasks
   block:
     - include_tasks: prep.yml
