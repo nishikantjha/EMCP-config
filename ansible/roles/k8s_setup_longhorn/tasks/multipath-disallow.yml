@@ -1,28 +1,25 @@
-- name: Read the multipath configuration
-  ansible.builtin.command: multipath -t
-  changed_when: false
-  register: cmd_multipath
-
-- name: Parse the configuration directory value
-  ansible.builtin.set_fact:
-    multipath_config_dir: "{{ cmd_multipath['stdout'] | regex_findall('config_dir \"(.+?)\"') | last }}"
-  when: cmd_multipath is not skipped
-
 - name: Make sure the configuration directory exists
   ansible.builtin.file:
-    path: "{{ multipath_config_dir }}"
+    path: /etc/multipath/conf.d
     state: directory
     owner: root
     group: root
     mode: 0755
-  when: multipath_config_dir is defined
 
 - name: Add the longhorn configuration
-  ansible.builtin.copy:
-    src: 01_longhorn.conf
-    dest: "{{ multipath_config_dir }}/01_longhorn.conf"
+  ansible.builtin.template:
+    src: "{{ multipath_longhorn_conf_filename }}.j2"
+    dest: "/etc/multipath/conf.d/{{ multipath_longhorn_conf_filename }}"
     owner: root
     group: root
     mode: 0644
-  when: multipath_config_dir is defined
   notify: reload multipathd
+
+- name: Flush handlers before testing
+  ansible.builtin.meta: flush_handlers
+
+- name: Verify that changes have been applied
+  ansible.builtin.command: multipath -t
+  register: cmd_multipath
+  changed_when: false
+  failed_when: not (cmd_multipath['stdout'] | regex_search(multipath_longhorn_regex | regex_escape))
