@@ -1,15 +1,17 @@
 ---
-- name: Allow members of the group "admins" to be sudoers without a password
+- name: Create sudo rules listed in the ipapolicies dictionary
   community.general.ipa_sudorule:
-    name: sudo_admins_nopasswd
-    description: Allow members of the group "admins" to execute any command on any host without a password
-    cmdcategory: all
-    hostcategory: all
-    usergroup:
-      - admins
-    sudoopt:
-      - "!authenticate"
+    name: "{{ users_item['name'] }}"
+    description: "{{ users_item['description'] }}"
+    cmdcategory: "{{ users_item['cmdcategory'] | default(omit) }}"
+    hostcategory: "{{ users_item['hostcategory'] | default(omit) }}"
+    hostgroup: "{{ users_item['hostgroup'] | default(omit) }}"
+    usergroup: "{{ users_item['usergroup'] | default(omit) }}"
+    sudoopt: "{{ users_item['sudoopt'] | default(omit) }}"
     ipa_host: "{{ primary_ipaserver }}"
     ipa_pass: "{{ ipaadmin_password }}"
     validate_certs: false
     state: enabled
+  loop: "{{ ipapolicies['sudorules'] }}"
+  loop_control:
+    loop_var: users_item
