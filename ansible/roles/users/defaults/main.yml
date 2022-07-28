@@ -1,0 +1,10 @@
+ipapolicies:
+  sudorules:
+    - name: sudo_admins_nopasswd
+      description: Allow members of the group "admins" to execute any command on any host without a password
+      cmdcategory: all
+      hostcategory: all
+      usergroup:
+        - admins
+      sudoopt:
+        - "!authenticate"
