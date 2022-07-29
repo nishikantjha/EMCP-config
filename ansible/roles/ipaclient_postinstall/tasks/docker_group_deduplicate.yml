@@ -1,18 +1,37 @@
 ---
-- name: Install the lgroupdel prerequisite
+- name: Make sure that an IPA docker group exists
+  ansible.builtin.getent:
+    database: group
+    key: docker
+    service: sss
+
+- name: Obtain the numeric ID of the IPA docker group
+  ansible.builtin.set_fact:
+    ipa_docker_gid: "{{ ansible_facts['getent_group']['docker'][1] }}"
+
+- name: Make sure that the docker socket is owned by the IPA group
+  ansible.builtin.file:
+    path: /var/run/docker.sock
+    owner: root
+    group: "{{ ipa_docker_gid }}"
+    mode: 0660
+
+- name: Check whether a local docker group exists
+  ansible.builtin.getent:
+    database: group
+    key: docker
+    fail_key: false
+    service: files
+
+- name: Install the lgroupdel prerequisite to remove local groups
   ansible.builtin.apt:
     name: libuser
     state: present
+  when: ansible_facts['getent_group']['docker']
 
 - name: Remove the local docker group
   ansible.builtin.group:
     name: docker
     local: true
     state: absent
-
-- name: Make sure that the docker socket is owned by the IPA group
-  ansible.builtin.file:
-    path: /var/run/docker.sock
-    owner: root
-    group: docker
-    mode: '0660'
+  when: ansible_facts['getent_group']['docker']
