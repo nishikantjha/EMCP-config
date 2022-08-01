@@ -1,17 +1,20 @@
 ---
-- name: Check whether a docker group already exists in IPA
-  block:
-  - include_tasks: ipa_group_exists.yml
-  run_once: true
+- name: Check whether the docker socket exists
+  ansible.builtin.stat:
+    path: /var/run/docker.sock
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
+  register: docker_socket
   tags: ipaclient-deduplicate-groups
 
-- name: If the docker group is managed in IPA, remove the local duplicate
+- name: Make sure there's no local duplicate of the IPA docker group
   block:
-  - include_tasks: docker_group_deduplicate.yml
-  when: docker_group_exists
+    - include_tasks: docker_group_deduplicate.yml
+  when: docker_socket['stat']['exists']
   tags: ipaclient-deduplicate-groups
 
 - name: Change the default umask for user homes created by the pam_mkhomedir module.
   block:
-  - include_tasks: pam_mkhomedir_umask.yml
+    - include_tasks: pam_mkhomedir_umask.yml
   tags: ipaclient-homedir-permissions
