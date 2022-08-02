@@ -12,15 +12,6 @@
       - systemd-timesyncd
     state: present
 
-# Since the packages ntp, chrony and systemd-timesyncd are mutually exclusive,
-# if ntp or chrony are installed manually or as dependencies, they remove
-# systemd-timesyncd and risk breaking the configuration. To prevent this,
-# mark systemd-timesyncd as held.
-- name: Prevent apt from automatically removing systemd-timesyncd
-  ansible.builtin.command: apt-mark hold systemd-timesyncd
-  register: cmd_apt_mark
-  changed_when: cmd_apt_mark['stdout'] == 'systemd-timesyncd set on hold.'
-
 - name: Enable and start the timesyncd service
   ansible.builtin.systemd:
     name: systemd-timesyncd
