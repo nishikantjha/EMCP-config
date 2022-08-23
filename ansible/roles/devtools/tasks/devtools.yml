@@ -3,6 +3,7 @@
   ansible.builtin.apt:
     name:
       - python3-venv
+      - python3-pip
       - tmux
       - zsh
       - rename
