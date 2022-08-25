@@ -1,0 +1,20 @@
+# Inventory group names
+slurm_gpu_group_name: slurm_compute_gpu
+
+# The version to install
+slurm_apt_version: "19.05.5"
+slurm_apt_version_with_release: "{{ slurm_apt_version }}-1"
+slurm_source_version: "19.05.8"
+slurm_source_version_with_release: "{{ slurm_source_version }}-1"
+slurm_github_tag: "slurm-{{ slurm_source_version_with_release | replace('.', '-') }}"
+
+# Output directory of the resulting packages
+slurm_build_result_dir: /var/tmp/slurmbuild-result
+
+# Source path of the munge key. It must be reachable from the target host.
+# Example: /mnt/slurm/munge.key
+slurm_munge_key_path: ""
+
+# Source path of the slurm conf file. It must be reachable from the target host.
+# Example: /mnt/slurm/slurm.conf
+slurm_conf_file_path: ""

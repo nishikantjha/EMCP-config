@@ -1,0 +1,25 @@
+---
+- name: On Ubuntu 20.04 and prior, install the official slurmd package
+  become: true
+  ansible.builtin.apt:
+    name: "slurmd={{ slurm_apt_version_with_release }}"
+    state: present
+    update_cache: true
+  when:
+    - ansible_facts['distribution'] == "Ubuntu"
+    - ansible_facts['distribution_major_version'] | int <= 20
+  tags: slurm-compute
+
+- name: On Ubuntu 21.10 and later, repackage slurmd
+  block:
+    - include_tasks: slurmd_repackage.yml
+  when:
+    - ansible_facts['distribution'] == "Ubuntu"
+    - ansible_facts['distribution_major_version'] | int > 20
+  tags: slurm-compute
+
+- name: Add configuration files and start the service
+  become: true
+  block:
+    - include_tasks: slurmd_configure.yml
+  tags: slurm-compute

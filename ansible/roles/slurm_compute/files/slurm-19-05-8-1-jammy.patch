@@ -1,0 +1,112 @@
+diff -Naur slurm-slurm-19-05-8-1.orig/debian/changelog slurm-slurm-19-05-8-1/debian/changelog
+--- slurm-slurm-19-05-8-1.orig/debian/changelog	2020-01-16 21:46:11.000000000 +0000
++++ slurm-slurm-19-05-8-1/debian/changelog	2022-08-30 13:06:19.368983905 +0000
+@@ -1,3 +1,11 @@
++slurm-llnl (19.05.8-1) UNRELEASED; urgency=medium
++
++  * Bump to 19.05.8-1.
++  * Add an hdf5 patch.
++  * Do not build smap. It doesn't compile on Ubuntu 22.04 and it got deprecated in slurm 20 anyway.
++
++ -- Enrico Nasca <enrico.nasca@ikim.uk-essen.de>  Mon, 29 Aug 2022 10:46:07 +0000
++
+ slurm-llnl (19.05.5-1) unstable; urgency=medium
+ 
+   * New upstream release
+diff -Naur slurm-slurm-19-05-8-1.orig/debian/control slurm-slurm-19-05-8-1/debian/control
+--- slurm-slurm-19-05-8-1.orig/debian/control	2020-01-10 23:16:13.000000000 +0000
++++ slurm-slurm-19-05-8-1/debian/control	2022-08-30 12:56:41.660807308 +0000
+@@ -8,7 +8,6 @@
+ Build-Depends:
+  debhelper (>= 11),
+  libmunge-dev,
+- libncurses5-dev,
+  po-debconf,
+  python3,
+  libgtk2.0-dev,
+@@ -17,7 +16,6 @@
+  libperl-dev,
+  chrpath,
+  libpam0g-dev,
+- liblua5.1-0-dev,
+  libhwloc-dev,
+  dh-exec,
+  librrd-dev,
+diff -Naur slurm-slurm-19-05-8-1.orig/debian/patches/series slurm-slurm-19-05-8-1/debian/patches/series
+--- slurm-slurm-19-05-8-1.orig/debian/patches/series	2020-01-10 23:14:36.000000000 +0000
++++ slurm-slurm-19-05-8-1/debian/patches/series	2022-08-30 12:56:41.664807335 +0000
+@@ -5,4 +5,5 @@
+ rpath
+ mpiexec-man-page
+ fix-perl-doc
++use-hdf5-18-api
+ use-python3
+diff -Naur slurm-slurm-19-05-8-1.orig/debian/patches/use-hdf5-18-api slurm-slurm-19-05-8-1/debian/patches/use-hdf5-18-api
+--- slurm-slurm-19-05-8-1.orig/debian/patches/use-hdf5-18-api	1970-01-01 00:00:00.000000000 +0000
++++ slurm-slurm-19-05-8-1/debian/patches/use-hdf5-18-api	2022-08-30 12:56:41.664807335 +0000
+@@ -0,0 +1,11 @@
++--- a/configure.ac	2020-11-12 16:55:07.000000000 +0000
+++++ b/configure.ac	2022-08-29 10:41:40.761478117 +0000
++@@ -204,7 +204,7 @@
++ # --with-default-api-version=v16 which creates problems for slurm
++ # because slurm uses the 1.8 API. By defining this CPP macro we get
++ # the 1.8 API.
++-AC_DEFINE([H5_NO_DEPRECATED_SYMBOLS], [1], [Make sure we get the 1.8 HDF5 API])
+++AC_DEFINE([H5_USE_18_API], [1], [Make sure we get the 1.8 HDF5 API])
++ 
++ AX_CHECK_ZLIB([], [])
++ X_AC_LZ4
+diff -Naur slurm-slurm-19-05-8-1.orig/debian/rules slurm-slurm-19-05-8-1/debian/rules
+--- slurm-slurm-19-05-8-1.orig/debian/rules	2020-01-10 23:16:13.000000000 +0000
++++ slurm-slurm-19-05-8-1/debian/rules	2022-08-30 12:56:41.664807335 +0000
+@@ -101,7 +101,6 @@
+ 	mv -v debian/tmp-emulator/usr/bin/srun 	debian/tmp-emulator/usr/bin/srun-emulator
+ 	mv -v debian/tmp-emulator/usr/bin/squeue 	debian/tmp-emulator/usr/bin/squeue-emulator
+ 	mv -v debian/tmp-emulator/usr/bin/sprio 	debian/tmp-emulator/usr/bin/sprio-emulator
+-	mv -v debian/tmp-emulator/usr/bin/smap 	debian/tmp-emulator/usr/bin/smap-emulator
+ 	mv -v debian/tmp-emulator/usr/bin/sdiag 	debian/tmp-emulator/usr/bin/sdiag-emulator
+ 	mv -v debian/tmp-emulator/usr/bin/strigger debian/tmp-emulator/usr/bin/strigger-emulator
+ 	mv -v debian/tmp-emulator/usr/bin/sinfo 	debian/tmp-emulator/usr/bin/sinfo-emulator
+diff -Naur slurm-slurm-19-05-8-1.orig/debian/slurm-client-emulator.install slurm-slurm-19-05-8-1/debian/slurm-client-emulator.install
+--- slurm-slurm-19-05-8-1.orig/debian/slurm-client-emulator.install	2020-01-10 23:14:36.000000000 +0000
++++ slurm-slurm-19-05-8-1/debian/slurm-client-emulator.install	2022-08-30 12:56:41.664807335 +0000
+@@ -7,7 +7,6 @@
+ debian/tmp-emulator/usr/bin/srun-emulator 		/usr/bin/
+ debian/tmp-emulator/usr/bin/squeue-emulator 	/usr/bin/
+ debian/tmp-emulator/usr/bin/sprio-emulator 		/usr/bin/
+-debian/tmp-emulator/usr/bin/smap-emulator 		/usr/bin/
+ debian/tmp-emulator/usr/bin/sdiag-emulator 		/usr/bin/
+ debian/tmp-emulator/usr/bin/strigger-emulator 	/usr/bin/
+ debian/tmp-emulator/usr/bin/sinfo-emulator 		/usr/bin/
+diff -Naur slurm-slurm-19-05-8-1.orig/debian/slurm-client-emulator.links slurm-slurm-19-05-8-1/debian/slurm-client-emulator.links
+--- slurm-slurm-19-05-8-1.orig/debian/slurm-client-emulator.links	2020-01-10 23:14:36.000000000 +0000
++++ slurm-slurm-19-05-8-1/debian/slurm-client-emulator.links	2022-08-30 12:56:41.664807335 +0000
+@@ -7,7 +7,6 @@
+ usr/share/man/man1/slurm-client-emulator.1.gz usr/share/man/man1/srun-emulator.1.gz
+ usr/share/man/man1/slurm-client-emulator.1.gz usr/share/man/man1/squeue-emulator.1.gz
+ usr/share/man/man1/slurm-client-emulator.1.gz usr/share/man/man1/sprio-emulator.1.gz
+-usr/share/man/man1/slurm-client-emulator.1.gz usr/share/man/man1/smap-emulator.1.gz
+ usr/share/man/man1/slurm-client-emulator.1.gz usr/share/man/man1/sdiag-emulator.1.gz
+ usr/share/man/man1/slurm-client-emulator.1.gz usr/share/man/man1/strigger-emulator.1.gz
+ usr/share/man/man1/slurm-client-emulator.1.gz usr/share/man/man1/sinfo-emulator.1.gz
+diff -Naur slurm-slurm-19-05-8-1.orig/debian/slurm-client.install slurm-slurm-19-05-8-1/debian/slurm-client.install
+--- slurm-slurm-19-05-8-1.orig/debian/slurm-client.install	2020-01-10 23:14:36.000000000 +0000
++++ slurm-slurm-19-05-8-1/debian/slurm-client.install	2022-08-30 13:08:36.734027373 +0000
+@@ -7,7 +7,6 @@
+ usr/bin/srun
+ usr/bin/squeue
+ usr/bin/sprio
+-usr/bin/smap
+ usr/bin/sdiag
+ usr/bin/strigger
+ usr/bin/sinfo
+diff -Naur slurm-slurm-19-05-8-1.orig/debian/slurm-client.manpages slurm-slurm-19-05-8-1/debian/slurm-client.manpages
+--- slurm-slurm-19-05-8-1.orig/debian/slurm-client.manpages	2020-01-10 23:14:36.000000000 +0000
++++ slurm-slurm-19-05-8-1/debian/slurm-client.manpages	2022-08-30 12:56:41.664807335 +0000
+@@ -1,6 +1,5 @@
+ debian/tmp/usr/share/man/man1/scancel.1
+ debian/tmp/usr/share/man/man1/sattach.1
+-debian/tmp/usr/share/man/man1/smap.1
+ debian/tmp/usr/share/man/man1/strigger.1
+ debian/tmp/usr/share/man/man1/sstat.1
+ debian/tmp/usr/share/man/man1/sprio.1

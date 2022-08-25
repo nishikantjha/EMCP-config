@@ -1,0 +1,52 @@
+---
+- name: Make sure that munge is enabled and started
+  ansible.builtin.systemd:
+    name: munge
+    state: started
+    enabled: true
+
+- name: Add the munge key
+  ansible.builtin.copy:
+    src: "{{ slurm_munge_key_path }}"
+    dest: /etc/munge/munge.key
+    remote_src: true
+    owner: munge
+    group: munge
+    mode: 0400
+  notify: restart munge
+
+- name: Make sure that slurmd is enabled and started
+  ansible.builtin.systemd:
+    name: slurmd
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Add the cgroup configuration file
+  ansible.builtin.copy:
+    src: cgroup.conf
+    dest: /etc/slurm-llnl/cgroup.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload slurmd
+
+- name: Add the GPU configuration file
+  ansible.builtin.copy:
+    src: gres.conf
+    dest: /etc/slurm-llnl/gres.conf
+    owner: root
+    group: root
+    mode: 0644
+  when: inventory_hostname in groups[slurm_gpu_group_name]
+  notify: reload slurmd
+
+- name: Add the main configuration file
+  ansible.builtin.copy:
+    src: "{{ slurm_conf_file_path }}"
+    dest: /etc/slurm-llnl/slurm.conf
+    remote_src: true
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload slurmd

@@ -1,0 +1,134 @@
+---
+- name: Gather information about installed packages
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Check whether slurmd is already installed
+  ansible.builtin.set_fact:
+    slurmd_installed: "{{ ('slurmd' in ansible_facts.packages) and (ansible_facts.packages['slurmd'][0]['version'] == slurm_source_version_with_release) }}"
+
+- name: Check whether the build results already exist
+  ansible.builtin.stat:
+    path: "{{ slurm_build_result_dir }}/slurmd_{{ slurm_source_version_with_release }}_amd64.deb"
+  register: slurmd_deb_pkg
+  when: not slurmd_installed
+
+- name: Install the ubuntu development toolchain
+  become: true
+  ansible.builtin.apt:
+    name:
+      - pbuilder
+      - ubuntu-dev-tools
+      - debhelper
+    state: present
+    update_cache: true
+  when:
+    - not slurmd_installed
+    - not slurmd_deb_pkg['stat']['exists']
+
+- name: Configure pbuilder to use the http proxy
+  become: true
+  ansible.builtin.blockinfile:
+    path: /etc/pbuilderrc
+    block: "export http_proxy={{ http_proxy }}"
+    owner: root
+    group: root
+    mode: 0644
+    state: present
+  when:
+    - not slurmd_installed
+    - not slurmd_deb_pkg['stat']['exists']
+    - http_proxy is defined
+
+- name: Create the pbuilder environment (max 30 minutes, poll every 10 seconds)
+  ansible.builtin.command: pbuilder-dist jammy create
+  changed_when: true
+  async: 1800
+  poll: 10
+  when:
+    - not slurmd_installed
+    - not slurmd_deb_pkg['stat']['exists']
+
+- name: Create a temporary work directory
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: build
+  register: slurm_builddir
+  when:
+    - not slurmd_installed
+    - not slurmd_deb_pkg['stat']['exists']
+
+- name: Obtain the upstream source code
+  ansible.builtin.get_url:
+    url: "https://github.com/SchedMD/slurm/archive/refs/tags/{{ slurm_github_tag }}.tar.gz"
+    dest: "{{ slurm_builddir['path'] }}/slurm-llnl_{{ slurm_source_version }}.orig.tar.gz"
+    mode: 0644
+  when: slurm_builddir['path'] is defined
+
+- name: Extract the upstream tarball
+  ansible.builtin.unarchive:
+    src: "{{ slurm_builddir['path'] }}/slurm-llnl_{{ slurm_source_version }}.orig.tar.gz"
+    dest: "{{ slurm_builddir['path'] }}"
+    remote_src: true
+  when: slurm_builddir['path'] is defined
+
+- name: Extract the upstream ubuntu build metadata
+  ansible.builtin.unarchive:
+    src: "http://archive.ubuntu.com/ubuntu/pool/universe/s/slurm-llnl/slurm-llnl_{{ slurm_apt_version_with_release }}.debian.tar.xz"
+    dest: "{{ slurm_builddir['path'] }}/slurm-{{ slurm_github_tag }}"
+    remote_src: true
+  when: slurm_builddir['path'] is defined
+
+- name: Patch the source tree
+  ansible.posix.patch:
+    src: "{{ slurm_github_tag }}-jammy.patch"
+    basedir: "{{ slurm_builddir['path'] }}/slurm-{{ slurm_github_tag }}"
+    strip: 1
+  when: slurm_builddir['path'] is defined
+
+- name: Create a buildable source package
+  ansible.builtin.command:
+    chdir: "{{ slurm_builddir['path'] }}/slurm-{{ slurm_github_tag }}"
+    argv:
+      - debuild
+      - -S
+      - -d
+      - -us
+      - -uc
+  changed_when: true
+  when: slurm_builddir['path'] is defined
+
+- name: Build an installable package (max 1 hour, poll every 10 seconds)
+  ansible.builtin.command:
+    argv:
+      - pbuilder-dist
+      - jammy
+      - build
+      - "{{ slurm_builddir['path'] }}/slurm-llnl_{{ slurm_source_version_with_release }}.dsc"
+      - --buildresult
+      - "{{ slurm_build_result_dir }}"
+  async: 3600
+  poll: 10
+  changed_when: true
+  when: slurm_builddir['path'] is defined
+
+# Installing multiple local deb packages with ansible.builtin.apt doesn't work.
+- name: Install the packages
+  become: true
+  ansible.builtin.command:
+    argv:
+      - apt-get
+      - -y
+      - install
+      - "{{ slurm_build_result_dir }}/slurm-wlm-basic-plugins_{{ slurm_source_version_with_release }}_amd64.deb"
+      - "{{ slurm_build_result_dir }}/slurmd_{{ slurm_source_version_with_release }}_amd64.deb"
+  changed_when: true
+  when:
+    - not slurmd_installed
+    - slurmd_deb_pkg['stat']['exists']
+
+- name: Delete the work directory
+  ansible.builtin.file:
+    path: "{{ slurm_builddir['path'] }}"
+    state: absent
+  when: slurm_builddir['path'] is defined

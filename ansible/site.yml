@@ -127,10 +127,19 @@
     - user_skel
 
 
-- hosts: slurm_nodes
+- hosts: slurm
+  remote_user: ubuntu
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - slurm_node
+
+
+- hosts: slurm_compute
+  remote_user: ubuntu
+  gather_facts: true
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - slurm_compute
 
 
 - hosts: rke_k8s_cluster
