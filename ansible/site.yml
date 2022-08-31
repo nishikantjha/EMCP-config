@@ -51,6 +51,18 @@
     - security
 
 
+- hosts: cpu
+  become: true
+  gather_facts: true
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - update
+    - c_nodes
+    - proxies
+    - security
+    - devtools
+
+
 - hosts: gpucluster
   become: true
   ignore_errors: true
@@ -107,17 +119,6 @@
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - nfs_client
-
-
-- hosts: managed_cluster_compute
-  gather_facts: true
-  environment: "{{ proxy_env | default({}) }}"
-  roles:
-    - update
-    - c_nodes
-    - proxies
-    - security
-    - devtools
 
 
 - hosts: nfs_servers
