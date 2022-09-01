@@ -1,0 +1,44 @@
+---
+- name: On non-compute slurm nodes, enable the enumerate option in sssd.conf
+  become: true
+  block:
+    - include_tasks: sssd_enumerate.yml
+  when: (inventory_hostname in groups[slurm_controller_group_name]) or (inventory_hostname in groups[slurm_user_group_name])
+  tags:
+    - slurm
+    - slurm-sssd
+
+- name: On Ubuntu 20.04 and prior, install the official slurmd package
+  become: true
+  ansible.builtin.apt:
+    name: "slurmd={{ slurm_apt_version_with_release }}"
+    state: present
+    update_cache: true
+  when:
+    - inventory_hostname in groups[slurm_compute_group_name]
+    - ansible_facts['distribution'] == "Ubuntu"
+    - ansible_facts['distribution_major_version'] | int <= 20
+  tags:
+    - slurm
+    - slurm-compute
+
+- name: On Ubuntu 21.10 and later, repackage slurmd
+  block:
+    - include_tasks: slurmd_repackage.yml
+  when:
+    - inventory_hostname in groups[slurm_compute_group_name]
+    - ansible_facts['distribution'] == "Ubuntu"
+    - ansible_facts['distribution_major_version'] | int > 20
+  tags:
+    - slurm
+    - slurm-compute
+
+- name: Add configuration files and start slurmd
+  become: true
+  block:
+    - include_tasks: slurmd_configure.yml
+  when:
+    - inventory_hostname in groups[slurm_compute_group_name]
+  tags:
+    - slurm
+    - slurm-compute

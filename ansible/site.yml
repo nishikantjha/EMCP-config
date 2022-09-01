@@ -130,17 +130,10 @@
 
 - hosts: slurm
   remote_user: ubuntu
-  environment: "{{ proxy_env | default({}) }}"
-  roles:
-    - slurm_node
-
-
-- hosts: slurm_compute
-  remote_user: ubuntu
   gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
   roles:
-    - slurm_compute
+    - slurm
 
 
 - hosts: rke_k8s_cluster

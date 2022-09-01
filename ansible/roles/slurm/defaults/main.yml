@@ -1,5 +1,9 @@
 # Inventory group names
+slurm_controller_group_name: slurm_controller
+slurm_user_group_name: slurm_user
+slurm_compute_group_name: slurm_compute
 slurm_gpu_group_name: slurm_compute_gpu
+slurm_cpu_group_name: slurm_compute_cpu
 
 # The version to install
 slurm_apt_version: "19.05.5"
