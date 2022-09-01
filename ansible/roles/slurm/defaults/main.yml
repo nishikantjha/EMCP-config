@@ -3,7 +3,6 @@ slurm_controller_group_name: slurm_controller
 slurm_user_group_name: slurm_user
 slurm_compute_group_name: slurm_compute
 slurm_gpu_group_name: slurm_compute_gpu
-slurm_cpu_group_name: slurm_compute_cpu
 
 # The version to install
 slurm_apt_version: "19.05.5"
@@ -15,10 +14,26 @@ slurm_github_tag: "slurm-{{ slurm_source_version_with_release | replace('.', '-'
 # Output directory of the resulting packages
 slurm_build_result_dir: /var/tmp/slurmbuild-result
 
-# Source path of the munge key. It must be reachable from the target host.
-# Example: /mnt/slurm/munge.key
-slurm_munge_key_path: ""
+# The munge secret which is hashed to create the munge key.
+# It should be encrypted with Ansible Vault.
+# It can be any value such as a random string generated with
+# cat /dev/urandom | tr -dc '[:alnum:]' | head -c 40
+slurm_munge_secret: "{{ vault_slurm_munge_secret }}"
 
-# Source path of the slurm conf file. It must be reachable from the target host.
-# Example: /mnt/slurm/slurm.conf
-slurm_conf_file_path: ""
+# Cluster name for the configuration file
+slurm_cluster_name: slurmcluster
+
+# The compute node partitions as a list of hashes.
+# Each hash has the following keys:
+#   name: the partition name as a string
+#   hosts: either the special value "ALL" or a list of inventory hosts
+# Example:
+#   - name: GPU
+#     hosts: "{{ groups[slurm_gpu_group_name] }}"
+#   - name: test
+#     hosts:
+#       - t01.example.org
+#       - t02.example.org
+slurm_partitions:
+  - name: batch
+    hosts: ALL

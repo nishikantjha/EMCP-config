@@ -6,10 +6,9 @@
     enabled: true
 
 - name: Add the munge key
-  ansible.builtin.copy:
-    src: "{{ slurm_munge_key_path }}"
+  ansible.builtin.template:
+    src: munge.key.j2
     dest: /etc/munge/munge.key
-    remote_src: true
     owner: munge
     group: munge
     mode: 0400
@@ -42,10 +41,9 @@
   notify: reload slurmd
 
 - name: Add the main configuration file
-  ansible.builtin.copy:
-    src: "{{ slurm_conf_file_path }}"
+  ansible.builtin.template:
+    src: slurm.conf.j2
     dest: /etc/slurm-llnl/slurm.conf
-    remote_src: true
     owner: root
     group: root
     mode: 0644
