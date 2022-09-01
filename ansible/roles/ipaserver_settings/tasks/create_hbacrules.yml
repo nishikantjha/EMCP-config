@@ -18,8 +18,9 @@
     name: "{{ ipaserver_settings_item['hbacrule_name'] }}"
     description: "{{ ipaserver_settings_item['hbacrule_description'] }}"
     hostgroup: "{{ ipaserver_settings_item['name'] }}"
-    usergroup: "{{ ipaserver_settings_item['usergroup'] }}"
-    service: sshd
+    user: "{{ ipaserver_settings_item['user'] | default(omit) }}"
+    usergroup: "{{ ipaserver_settings_item['usergroup'] | default(omit) }}"
+    service: "{{ ipaserver_settings_item['service'] | default(['sshd']) }}"
     ipa_host: "{{ primary_ipaserver }}"
     ipa_pass: "{{ ipaadmin_password }}"
     validate_certs: false
