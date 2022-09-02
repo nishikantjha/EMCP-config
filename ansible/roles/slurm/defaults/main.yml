@@ -1,18 +1,22 @@
 # Inventory group names
 slurm_controller_group_name: slurm_controller
 slurm_user_group_name: slurm_user
+slurm_pkgrepo_group_name: slurm_pkgrepo
 slurm_compute_group_name: slurm_compute
 slurm_gpu_group_name: slurm_compute_gpu
 
 # The version to install
-slurm_apt_version: "19.05.5"
-slurm_apt_version_with_release: "{{ slurm_apt_version }}-1"
-slurm_source_version: "19.05.8"
-slurm_source_version_with_release: "{{ slurm_source_version }}-1"
-slurm_github_tag: "slurm-{{ slurm_source_version_with_release | replace('.', '-') }}"
+slurm_upstream_version: "19.05.5"
+slurm_upstream_version_with_release: "{{ slurm_upstream_version }}-1"
+slurm_version: "19.05.8"
+slurm_version_with_release: "{{ slurm_version }}-1"
+slurm_github_tag: "slurm-{{ slurm_version_with_release | replace('.', '-') }}"
 
-# Output directory of the resulting packages
-slurm_build_result_dir: /var/tmp/slurmbuild-result
+# Information on the local package repository.
+# The host in groups[slurm_pkgrepo_group_name] builds the slurm package and
+# serves it from this local package repository.
+slurm_repo_local_path: /srv/pkg
+slurm_repo_uri: "file:{{ slurm_repo_local_path }}"
 
 # The munge secret which is hashed to create the munge key.
 # It should be encrypted with Ansible Vault.

@@ -8,38 +8,33 @@
     - slurm
     - slurm-sssd
 
-- name: On Ubuntu 20.04 and prior, install the official slurmd package
-  become: true
-  ansible.builtin.apt:
-    name: "slurmd={{ slurm_apt_version_with_release }}"
-    state: present
-    update_cache: true
-  when:
-    - inventory_hostname in groups[slurm_compute_group_name]
-    - ansible_facts['distribution'] == "Ubuntu"
-    - ansible_facts['distribution_major_version'] | int <= 20
-  tags:
-    - slurm
-    - slurm-compute
-
-- name: On Ubuntu 21.10 and later, repackage slurmd
+- name: Build slurm and create a package repository
   block:
-    - include_tasks: slurmd_repackage.yml
-  when:
-    - inventory_hostname in groups[slurm_compute_group_name]
-    - ansible_facts['distribution'] == "Ubuntu"
-    - ansible_facts['distribution_major_version'] | int > 20
+    - include_tasks: slurmd_repo_create.yml
+      loop:
+        - focal
+        - jammy
+      loop_control:
+        loop_var: slurm_item
+  when: inventory_hostname in groups[slurm_pkgrepo_group_name]
   tags:
     - slurm
-    - slurm-compute
+    - slurm-build
+
+- name: Install slurmd from the custom repository
+  become: true
+  block:
+    - include_tasks: slurmd_repo_install.yml
+  when: inventory_hostname in groups[slurm_compute_group_name]
+  tags:
+    - slurm
+    - slurm-install
 
 - name: Add configuration files and start slurmd
   become: true
   block:
     - include_tasks: slurmd_configure.yml
-  when:
-    - inventory_hostname in groups[slurm_compute_group_name]
+  when: inventory_hostname in groups[slurm_compute_group_name]
   tags:
     - slurm
-    - slurm-compute
     - slurm-config
