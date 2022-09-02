@@ -6,15 +6,16 @@ slurm_compute_group_name: slurm_compute
 slurm_gpu_group_name: slurm_compute_gpu
 
 # The version to install
-slurm_upstream_version: "19.05.5"
-slurm_upstream_version_with_release: "{{ slurm_upstream_version }}-1"
+slurm_ubuntu_repo_version: "19.05.5"
+slurm_ubuntu_repo_version_with_release: "{{ slurm_ubuntu_repo_version }}-1"
 slurm_version: "19.05.8"
 slurm_version_with_release: "{{ slurm_version }}-1"
 slurm_github_tag: "slurm-{{ slurm_version_with_release | replace('.', '-') }}"
 
-# Information on the local package repository.
-# The host in groups[slurm_pkgrepo_group_name] builds the slurm package and
-# serves it from this local package repository.
+# Path of the work directory on the builder host
+slurm_builddir: /var/tmp/slurmbuild
+
+# Path of the local package repository on the builder host
 slurm_repo_local_path: /srv/pkg
 slurm_repo_uri: "file:{{ slurm_repo_local_path }}"
 
