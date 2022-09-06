@@ -15,8 +15,18 @@ slurm_github_tag: "slurm-{{ slurm_version_with_release | replace('.', '-') }}"
 # Path of the work directory on the builder host
 slurm_builddir: /var/tmp/slurmbuild
 
-# Path of the local package repository on the builder host
+# Path of the local package repository on the builder host.
+# The builder host builds the deb packages, copies them to the specified path
+# and creates repository metadata so that compute nodes can install the packages
+# via package manager. The user executing this role must have write permission
+# at the specified path.
 slurm_repo_local_path: /srv/pkg
+
+# URI of the package repository from the perspective of compute nodes.
+# See `man sources.list` for the supported URI schemes.
+# This role does not attempt to implement the package repository server;
+# for example, if the scheme is "file", the corresponding NFS mountpoint must be
+# deployed separately.
 slurm_repo_uri: "file:{{ slurm_repo_local_path }}"
 
 # The munge secret which is hashed to create the munge key.
