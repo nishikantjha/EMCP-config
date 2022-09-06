@@ -56,10 +56,5 @@ NodeName={{ hostvars[host]['ansible_hostname'] }} CPUs={{ hostvars[host]['ansibl
 {% endfor %}
 
 {% for partition in slurm_partitions %}
-{% if partition['hosts'] == 'ALL' %}
-PartitionName={{ partition['name'] }} Nodes=ALL Default=YES MaxTime=INFINITE State=UP
-{% else %}
-{% set nodelist = partition['hosts'] | map('extract', hostvars, 'ansible_hostname') | join(',') %}
-PartitionName={{ partition['name'] }} Nodes=[{{ nodelist }}] Default=YES MaxTime=INFINITE State=UP
-{% endif %}
+PartitionName={{ partition['name'] }} {% if partition['hosts'] == 'ALL' -%} Nodes=ALL {%- else -%} {%- set nodelist = partition['hosts'] | map('extract', hostvars, 'ansible_hostname') | join(',') -%} Nodes=[{{ nodelist }}] {%- endif %} Default=YES MaxTime=INFINITE State=UP
 {% endfor %}
