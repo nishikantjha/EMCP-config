@@ -98,16 +98,14 @@
   changed_when: true
 
 - name: Copy the built packages to the local repository
-  become: true
   ansible.builtin.copy:
     src: "{{ slurm_builddir }}/pbuilder/{{ slurm_item }}_result/"
     dest: "{{ slurm_repo_local_path }}/{{ slurm_item }}/"
     remote_src: true
-    owner: root
-    group: root
+    mode: preserve
+    directory_mode: 02775
 
 - name: Create the package index on the local repository
-  become: true
   ansible.builtin.shell:
     chdir: "{{ slurm_repo_local_path }}/{{ slurm_item }}"
     cmd: dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
