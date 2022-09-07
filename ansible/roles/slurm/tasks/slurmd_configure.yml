@@ -37,7 +37,9 @@
     owner: root
     group: root
     mode: 0644
-  when: inventory_hostname in groups[slurm_gpu_group_name]
+  when:
+    - ansible_local['gpu']['count'] is defined
+    - ansible_local['gpu']['count'] > 0
   notify: reload slurmd
 
 - name: Add the main configuration file

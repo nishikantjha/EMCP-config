@@ -3,7 +3,6 @@ slurm_controller_group_name: slurm_controller
 slurm_user_group_name: slurm_user
 slurm_pkgrepo_group_name: slurm_pkgrepo
 slurm_compute_group_name: slurm_compute
-slurm_gpu_group_name: slurm_compute_gpu
 
 # The version to install
 slurm_ubuntu_repo_version: "19.05.5"
@@ -43,8 +42,8 @@ slurm_cluster_name: slurmcluster
 #   name: the partition name as a string
 #   hosts: either the special value "ALL" or a list of inventory hosts
 # Example:
-#   - name: GPU
-#     hosts: "{{ groups[slurm_gpu_group_name] }}"
+#   - name: stable
+#     hosts: "{{ groups[slurm_compute_group_name] }}"
 #   - name: test
 #     hosts:
 #       - t01.example.org

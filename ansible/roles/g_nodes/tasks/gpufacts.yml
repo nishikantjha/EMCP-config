@@ -1,0 +1,23 @@
+---
+- name: Install requirements for collecting facts
+  ansible.builtin.apt:
+    name:
+      - pciutils
+    state: present
+    update_cache: true
+
+- name: Create the fact directory
+  ansible.builtin.file:
+    path: /etc/ansible/facts.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Add the script for collecting GPU facts
+  ansible.builtin.copy:
+    src: gpu.fact
+    dest: /etc/ansible/facts.d/
+    owner: root
+    group: root
+    mode: 0755

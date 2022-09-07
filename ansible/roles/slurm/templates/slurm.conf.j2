@@ -51,10 +51,12 @@ SlurmdLogFile=/var/log/slurmd.log
 #
 #
 # COMPUTE NODES
+GresTypes=gpu
 {% for host in groups[slurm_compute_group_name] %}
-NodeName={{ hostvars[host]['ansible_hostname'] }} CPUs={{ hostvars[host]['ansible_processor_nproc'] }} Boards=1 SocketsPerBoard={{ hostvars[host]['ansible_processor_count'] }} CoresPerSocket={{ hostvars[host]['ansible_processor_cores'] }} ThreadsPerCore={{ hostvars[host]['ansible_processor_threads_per_core'] }} State=UNKNOWN
+{% set gpu_count = hostvars[host]['ansible_local']['gpu']['count'] | default(0) %}
+NodeName={{ hostvars[host]['ansible_hostname'] }} {% if gpu_count > 0 -%} Gres=gpu:{{ gpu_count }} {% endif -%} CPUs={{ hostvars[host]['ansible_processor_nproc'] }} Boards=1 SocketsPerBoard={{ hostvars[host]['ansible_processor_count'] }} CoresPerSocket={{ hostvars[host]['ansible_processor_cores'] }} ThreadsPerCore={{ hostvars[host]['ansible_processor_threads_per_core'] }} State=UNKNOWN
 {% endfor %}
 
 {% for partition in slurm_partitions %}
-PartitionName={{ partition['name'] }} {% if partition['hosts'] == 'ALL' -%} Nodes=ALL {%- else -%} {%- set nodelist = partition['hosts'] | map('extract', hostvars, 'ansible_hostname') | join(',') -%} Nodes=[{{ nodelist }}] {%- endif %} Default=YES MaxTime=INFINITE State=UP
+PartitionName={{ partition['name'] }} {% if partition['hosts'] == 'ALL' -%} Nodes=ALL {% else -%} {% set nodelist = partition['hosts'] | map('extract', hostvars, 'ansible_hostname') | join(',') -%} Nodes=[{{ nodelist }}] {% endif -%} Default=YES MaxTime=INFINITE State=UP
 {% endfor %}
