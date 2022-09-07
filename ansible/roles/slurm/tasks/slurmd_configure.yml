@@ -31,8 +31,8 @@
   notify: reload slurmd
 
 - name: Add the GPU configuration file
-  ansible.builtin.copy:
-    src: gres.conf
+  ansible.builtin.template:
+    src: gres.conf.j2
     dest: /etc/slurm-llnl/gres.conf
     owner: root
     group: root
