@@ -41,9 +41,11 @@ slurm_cluster_name: slurmcluster
 # Each hash has the following keys:
 #   name: the partition name as a string
 #   hosts: either the special value "ALL" or a list of inventory hosts
+#   default: the value of the "Default" parameter in slurm.conf (optional boolean, false if unspecified)
 # Example:
 #   - name: stable
 #     hosts: "{{ groups[slurm_compute_group_name] }}"
+#     default: true
 #   - name: test
 #     hosts:
 #       - t01.example.org
@@ -51,3 +53,4 @@ slurm_cluster_name: slurmcluster
 slurm_partitions:
   - name: batch
     hosts: ALL
+    default: true
