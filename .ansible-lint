@@ -6,7 +6,7 @@ exclude_paths:
   - ansible/roles/k8s_setup_monitoring/files/manifests/
 # parseable: true
 # quiet: true
-# verbosity: 1
+verbosity: -2
 
 # Mock modules or roles in order to pass ansible-playbook --syntax-check
 # mock_modules:
@@ -34,7 +34,8 @@ use_default_rules: true
 #   - ./rule/directory/
 
 # This makes linter to fully ignore rules/tags listed below
-# skip_list:
+skip_list:
+  - name[casing]  # Rule for checking task and play names.
 
 # Any rule that has the 'opt-in' tag will not be loaded unless its 'id' is
 # mentioned in the enable_list:
