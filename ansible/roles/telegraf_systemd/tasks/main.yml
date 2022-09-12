@@ -1,4 +1,4 @@
-
+---
 - name: include telegraf setup tasks
   block:
     - include_tasks: install_telegraf.yml

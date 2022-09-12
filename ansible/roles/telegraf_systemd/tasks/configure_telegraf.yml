@@ -1,4 +1,4 @@
-
+---
 - name: write the telegraf config file
   ansible.builtin.template:
     src: telegraf.conf.j2
