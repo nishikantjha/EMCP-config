@@ -1,4 +1,4 @@
-
+---
 - name: create prometheus additional config resource
   kubernetes.core.k8s:
     state: present
