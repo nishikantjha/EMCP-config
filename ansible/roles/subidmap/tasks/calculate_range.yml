@@ -33,7 +33,7 @@
 
 - name: Calculate the last possible IPA ID
   ansible.builtin.set_fact:
-    last_ipa_id: "{{ first_ipa_id|int + ipa_range_size|int - 1 }}"
+    last_ipa_id: "{{ first_ipa_id | int + ipa_range_size | int - 1 }}"
   when:
     - first_ipa_id is defined
     - ipa_range_size is defined
@@ -64,7 +64,7 @@
 # of users defined by mappable_users_cap.
 - name: Find a suitable value for the last subordinate ID
   ansible.builtin.set_fact:
-    subid_stop: "{{ subid_start|int + mappable_users_cap*subid_step }}"
+    subid_stop: "{{ subid_start | int + mappable_users_cap * subid_step }}"
   when: subid_start is defined
 
 - name: Make sure that the last subordinate ID does not overflow

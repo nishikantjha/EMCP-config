@@ -1,4 +1,4 @@
-
+---
 - name: get influxdata apt repo key
   ansible.builtin.get_url:
     url: https://repos.influxdata.com/influxdb.key
