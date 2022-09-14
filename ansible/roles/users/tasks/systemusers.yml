@@ -5,7 +5,7 @@
     ipa_pass: "{{ ipaadmin_password }}"
     name: "{{ users_item['name'] }}"
     mail: "{{ users_item['email'] | default([]) }}"
-    loginshell: "{{ users_item['loginshell'] | default(/usr/sbin/nologin) }}"
+    loginshell: "{{ users_item['loginshell'] | default('/usr/sbin/nologin') }}"
     sshpubkey: "{{ users_item['sshpubkey'] | default([]) }}"
     validate_certs: false
     state: present
