@@ -1,0 +1,18 @@
+---
+- name: reload slurmd
+  become: true
+  ansible.builtin.systemd:
+    name: slurmd
+    state: reloaded
+
+- name: restart munge
+  become: true
+  ansible.builtin.systemd:
+    name: munge
+    state: restarted
+
+- name: restart sssd
+  become: true
+  ansible.builtin.systemd:
+    name: sssd
+    state: restarted

@@ -1,0 +1,56 @@
+# Inventory group names
+slurm_controller_group_name: slurm_controller
+slurm_user_group_name: slurm_user
+slurm_pkgrepo_group_name: slurm_pkgrepo
+slurm_compute_group_name: slurm_compute
+
+# The version to install
+slurm_ubuntu_repo_version: "19.05.5"
+slurm_ubuntu_repo_version_with_release: "{{ slurm_ubuntu_repo_version }}-1"
+slurm_version: "19.05.8"
+slurm_version_with_release: "{{ slurm_version }}-1"
+slurm_github_tag: "slurm-{{ slurm_version_with_release | replace('.', '-') }}"
+
+# Path of the work directory on the builder host
+slurm_builddir: /var/tmp/slurmbuild
+
+# Path of the local package repository on the builder host.
+# The builder host builds the deb packages, copies them to the specified path
+# and creates repository metadata so that compute nodes can install the packages
+# via package manager. The user executing this role must have write permission
+# at the specified path.
+slurm_repo_local_path: /srv/pkg
+
+# URI of the package repository from the perspective of compute nodes.
+# See `man sources.list` for the supported URI schemes.
+# This role does not attempt to implement the package repository server;
+# for example, if the scheme is "file", the corresponding NFS mountpoint must be
+# deployed separately.
+slurm_repo_uri: "file:{{ slurm_repo_local_path }}"
+
+# The munge secret which is hashed to create the munge key.
+# It should be encrypted with Ansible Vault.
+# It can be any value such as a random string generated with
+# cat /dev/urandom | tr -dc '[:alnum:]' | head -c 40
+slurm_munge_secret: "{{ vault_slurm_munge_secret }}"
+
+# Cluster name for the configuration file
+slurm_cluster_name: slurmcluster
+
+# The compute node partitions as a list of hashes.
+# Each hash has the following keys:
+#   name: the partition name as a string
+#   hosts: either the special value "ALL" or a list of inventory hosts
+#   default: the value of the "Default" parameter in slurm.conf (optional boolean, false if unspecified)
+# Example:
+#   - name: stable
+#     hosts: "{{ groups[slurm_compute_group_name] }}"
+#     default: true
+#   - name: test
+#     hosts:
+#       - t01.example.org
+#       - t02.example.org
+slurm_partitions:
+  - name: batch
+    hosts: ALL
+    default: true

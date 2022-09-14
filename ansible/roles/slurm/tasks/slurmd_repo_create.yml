@@ -1,0 +1,112 @@
+---
+- name: Install the ubuntu development toolchain
+  become: true
+  ansible.builtin.apt:
+    name:
+      - dpkg-dev
+      - pbuilder
+      - ubuntu-dev-tools
+      - debhelper
+    state: present
+    update_cache: true
+
+- name: Configure pbuilder to use the http proxy
+  become: true
+  ansible.builtin.blockinfile:
+    path: /etc/pbuilderrc
+    block: "export http_proxy={{ http_proxy }}"
+    owner: root
+    group: root
+    mode: 0644
+    state: present
+  when: http_proxy is defined
+
+- name: Create the work directory
+  ansible.builtin.file:
+    path: "{{ slurm_builddir }}"
+    state: directory
+    mode: 0755
+
+- name: Obtain the upstream source code
+  ansible.builtin.get_url:
+    url: "https://github.com/SchedMD/slurm/archive/refs/tags/{{ slurm_github_tag }}.tar.gz"
+    dest: "{{ slurm_builddir }}/slurm-llnl_{{ slurm_version }}.orig.tar.gz"
+    mode: 0644
+
+- name: Clean up the patched source tree if it already exists
+  ansible.builtin.file:
+    path: "{{ slurm_builddir }}/slurm-{{ slurm_github_tag }}"
+    state: absent
+
+- name: Extract the upstream tarball
+  ansible.builtin.unarchive:
+    src: "{{ slurm_builddir }}/slurm-llnl_{{ slurm_version }}.orig.tar.gz"
+    dest: "{{ slurm_builddir }}"
+    remote_src: true
+
+- name: Extract the ubuntu build metadata
+  ansible.builtin.unarchive:
+    src: "http://archive.ubuntu.com/ubuntu/pool/universe/s/slurm-llnl/slurm-llnl_{{ slurm_ubuntu_repo_version_with_release }}.debian.tar.xz"
+    dest: "{{ slurm_builddir }}/slurm-{{ slurm_github_tag }}"
+    remote_src: true
+
+- name: Patch the source tree
+  ansible.posix.patch:
+    src: "{{ slurm_github_tag }}-{{ ansible_distribution_release }}.patch"
+    basedir: "{{ slurm_builddir }}/slurm-{{ slurm_github_tag }}"
+    strip: 1
+
+- name: Create a buildable source package
+  ansible.builtin.command:
+    chdir: "{{ slurm_builddir }}/slurm-{{ slurm_github_tag }}"
+    argv:
+      - debuild
+      - -S
+      - -d
+      - -us
+      - -uc
+  changed_when: true
+
+- name: Clean up the pbuilder result directory if it already exists
+  ansible.builtin.file:
+    path: "{{ slurm_builddir }}/pbuilder/{{ slurm_item }}_result"
+    state: absent
+
+- name: Create a pbuilder environment (max 30 minutes, poll every 10 seconds)
+  environment:
+    PBUILDFOLDER: "{{ slurm_builddir }}/pbuilder"
+  ansible.builtin.command:
+    argv:
+      - pbuilder-dist
+      - "{{ slurm_item }}"
+      - create
+  changed_when: true
+  async: 1800
+  poll: 10
+
+- name: Build installable packages (max 1 hour, poll every 10 seconds)
+  environment:
+    PBUILDFOLDER: "{{ slurm_builddir }}/pbuilder"
+  ansible.builtin.command:
+    argv:
+      - pbuilder-dist
+      - "{{ slurm_item }}"
+      - build
+      - "{{ slurm_builddir }}/slurm-llnl_{{ slurm_version_with_release }}.dsc"
+  async: 3600
+  poll: 10
+  changed_when: true
+
+- name: Copy the built packages to the local repository
+  ansible.builtin.copy:
+    src: "{{ slurm_builddir }}/pbuilder/{{ slurm_item }}_result/"
+    dest: "{{ slurm_repo_local_path }}/{{ slurm_item }}/"
+    remote_src: true
+    mode: preserve
+    directory_mode: 02775
+
+- name: Create the package index on the local repository
+  ansible.builtin.shell:
+    chdir: "{{ slurm_repo_local_path }}/{{ slurm_item }}"
+    cmd: dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
+  changed_when: true

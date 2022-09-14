@@ -1,85 +1,12 @@
 ---
-
-# md0 is created as raid0 (via mdadm), ext4 format, mounted at /local by MAAS already.
-# Hence the commented parts below are not necessary, leaving them for reference if required in the future
-# - name: create a md0 device from the two NVMe drives
-# <TBD>
-
-# - name: partition the md0 device
-#   community.general.parted:
-#     device: /dev/md0
-#     number: 1
-#     state: present
-#   become: true
-#   tags:
-#     - mount_local
-
-# - name: format the drive
-#   filesystem:
-#     fstype: ext4
-#     dev: /dev/md0
-#   become: true
-
-# - name: create /local directory
-#   file:
-#     path: /local
-#     state: directory
-#     owner: root
-#     group: root
-#     mode: 0755
-#   become: true
-#   tags:
-#     - mount_local
-
-- name: unmount /local
-  ansible.posix.mount:
-    path: /local
-    state: unmounted
-  tags:
-    unmount_local
-
-- name: mount /local
-  mount:
-    path: /local
-    src: /dev/md0
-    fstype: ext4
-    opts: acl,user_xattr
-    state: mounted
+- name: Create the /local mountpoint
   become: true
-  tags:
-    - mount_local
+  block:
+    - include_tasks: mount_local.yml
+  tags: mount_local
 
-
-- name: create /local/work directory
-  ansible.builtin.file:
-    path: /local/work
-    state: directory
-    owner: root
-    group: root
-    mode: 0777
+- name: Prepare the host for gathering GPU facts
   become: true
-  tags:
-    - mount_local
-
-- name: create /local/cache directory
-  ansible.builtin.file:
-    path: /local/cache
-    state: directory
-    owner: root
-    group: root
-    mode: 0770
-  become: true
-  tags:
-    - mount_local
-
-
-- name: create /local/cache directory
-  ansible.builtin.file:
-    path: /local/cache/fscache
-    state: directory
-    owner: root
-    group: root
-    mode: 0770
-  become: true
-  tags:
-    - mount_local
+  block:
+    - include_tasks: gpufacts.yml
+  tags: gpufacts

@@ -1,6 +1,0 @@
----
-- name: Enable the enumerate option in sssd.conf
-  become: true
-  block:
-    - include_tasks: sssd_enumerate.yml
-  tags: slurm-node

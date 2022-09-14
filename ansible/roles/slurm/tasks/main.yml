@@ -1,0 +1,40 @@
+---
+- name: On non-compute slurm nodes, enable the enumerate option in sssd.conf
+  become: true
+  block:
+    - include_tasks: sssd_enumerate.yml
+  when: (inventory_hostname in groups[slurm_controller_group_name]) or (inventory_hostname in groups[slurm_user_group_name])
+  tags:
+    - slurm
+    - slurm-sssd
+
+- name: Build slurm and create a package repository
+  block:
+    - include_tasks: slurmd_repo_create.yml
+      loop:
+        - focal
+        - jammy
+      loop_control:
+        loop_var: slurm_item
+  when: inventory_hostname in groups[slurm_pkgrepo_group_name]
+  tags:
+    - slurm
+    - slurm-build
+
+- name: Install slurmd from the custom repository
+  become: true
+  block:
+    - include_tasks: slurmd_repo_install.yml
+  when: inventory_hostname in groups[slurm_compute_group_name]
+  tags:
+    - slurm
+    - slurm-install
+
+- name: Add configuration files and start slurmd
+  become: true
+  block:
+    - include_tasks: slurmd_configure.yml
+  when: inventory_hostname in groups[slurm_compute_group_name]
+  tags:
+    - slurm
+    - slurm-config

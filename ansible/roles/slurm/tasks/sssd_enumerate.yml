@@ -1,6 +1,6 @@
 - name: Enable the enumerate option in sssd.conf
   ansible.builtin.template:
-    src: 01_slurm.conf.j2
+    src: ssd_slurm_conf.j2
     dest: /etc/sssd/conf.d/01_slurm.conf
     owner: root
     group: root

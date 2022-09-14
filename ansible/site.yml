@@ -51,6 +51,18 @@
     - security
 
 
+- hosts: cpu
+  become: true
+  gather_facts: true
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - update
+    - c_nodes
+    - proxies
+    - security
+    - devtools
+
+
 - hosts: gpucluster
   become: true
   ignore_errors: true
@@ -109,17 +121,6 @@
     - nfs_client
 
 
-- hosts: managed_cluster_compute
-  gather_facts: true
-  environment: "{{ proxy_env | default({}) }}"
-  roles:
-    - update
-    - c_nodes
-    - proxies
-    - security
-    - devtools
-
-
 - hosts: nfs_servers
   environment: "{{ proxy_env | default({}) }}"
   roles:
@@ -127,10 +128,12 @@
     - user_skel
 
 
-- hosts: slurm_nodes
+- hosts: slurm
+  remote_user: ubuntu
+  gather_facts: true
   environment: "{{ proxy_env | default({}) }}"
   roles:
-    - slurm_node
+    - slurm
 
 
 - hosts: rke_k8s_cluster

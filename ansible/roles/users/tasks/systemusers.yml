@@ -4,8 +4,8 @@
     ipa_host: "{{ primary_ipaserver }}"
     ipa_pass: "{{ ipaadmin_password }}"
     name: "{{ users_item['name'] }}"
-    loginshell: /usr/sbin/nologin
-    sshpubkey: []
+    loginshell: "{{ users_item['loginshell'] | default(/usr/sbin/nologin) }}"
+    sshpubkey: "{{ users_item['sshpubkey'] | default([]) }}"
     validate_certs: false
     state: present
   loop: "{{ ipasystemusers }}"
