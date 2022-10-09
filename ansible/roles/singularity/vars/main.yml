@@ -1,0 +1,2 @@
+singularity_release: "singularity-ce_3.10.3-jammy_amd64.deb"
+singularity_url: "https://github.com/sylabs/singularity/releases/download/v3.10.3/{{ singularity_release }}"
