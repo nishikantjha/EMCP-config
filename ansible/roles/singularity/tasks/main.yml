@@ -1,21 +1,14 @@
 ---
-- name: Download Go
-  ansible.builtin.apt:
-    name: "golang-go"
-    state: "latest"
-    update_cache: true
 - name: Download Singularity .deb file
-  become: true
   ansible.builtin.get_url:
     url: "{{ singularity_url }}"
-    dest: "./{{ singularity_release }}"
+    dest: "/tmp/{{ singularity_release }}"
 - name: Install a .deb package
   become: true
   ansible.builtin.apt:
-    deb: "./{{ singularity_release }}"
+    deb: "/tmp/{{ singularity_release }}"
 - name: delete .deb file
-  become: true
   file:
-    path: "./{{ singularity_release }}"
+    path: "/tmp/{{ singularity_release }}"
     state: absent
 

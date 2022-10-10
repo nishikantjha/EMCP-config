@@ -1,0 +1,12 @@
+---
+- hosts: cnodes
+  environment:
+     https_proxy: http://proxy.ikim.uk-essen.de:3128
+     HTTPS_PROXY: http://proxy.ikim.uk-essen.de:3128
+     HTTP_PROXY: http://proxy.ikim.uk-essen.de:3128
+     http_proxy: http://proxy.ikim.uk-essen.de:3128
+  become: yes
+  remote_user: njha
+  gather_facts: true
+  roles:
+    - role: singularity
